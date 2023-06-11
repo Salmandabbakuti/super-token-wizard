@@ -1,135 +1,159 @@
-"use client";
 import React, { useState } from "react";
-import contractTemplate from "./utils/contractTemplate";
+import { Input, Checkbox, Button, Typography } from "antd";
+import "antd/dist/antd.css";
+
+const { TextArea } = Input;
+const { Text } = Typography;
 
 const SuperTokenWizard = () => {
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
-  const [premintAmount, setPremintAmount] = useState("");
+  const [premintQuantity, setPremintQuantity] = useState("");
   const [isMintable, setIsMintable] = useState(false);
   const [isOwnable, setIsOwnable] = useState(false);
-  const [network, setNetwork] = useState("mainnet");
   const [generatedCode, setGeneratedCode] = useState("");
-  const [deployedAddress, setDeployedAddress] = useState("");
 
-  const generateContractCode = () => {
-    const code = contractTemplate
-      .replace(
-        "$OWNABLE_IMPORT$",
-        isOwnable
-          ? "import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';"
-          : ""
-      )
-      .replace("$OWNABLE_INHERITANCE$", isOwnable ? ", Ownable" : "")
-      .replace("$PREMINT_AMOUNT$", premintAmount)
-      .replace("$ONLY_OWNER$", isOwnable ? "onlyOwner" : "");
-    setGeneratedCode(code);
+  const handleGenerateCode = () => {
+    // Generate the contract code based on the selected options
+    // Store the generated code in the generatedCode state variable
+    // You can use the previous code generation logic here
+    const contractCode = `
+                                    // Your generated contract code here
+                                        `;
+    setGeneratedCode(contractCode);
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(generatedCode);
-    // Show a success message or notification to the user
+  const handleCopyCode = () => {
+    // Copy the generated code to the clipboard
+    // You can use the Clipboard API or a third-party library here
   };
 
-  const handleDeploy = async () => {
-    // Connect to the selected network using web3.js or ethers.js
-    // Deploy the contract using the generated code and the user's connected wallet
-    // Set the deployed address after a successful deployment
-    // Display an error message if the deployment fails
-    try {
-      // Deployment logic goes here
-      const deployedAddress = "0x123abc";
-      setDeployedAddress(deployedAddress);
-    } catch (error) {
-      console.error("Contract deployment failed:", error);
-      // Display an error message to the user
-    }
+  const handleOpenRemix = () => {
+    // Open the generated code in Remix IDE
+    // You can redirect the user to the Remix IDE URL with the generated code as a parameter
+  };
+
+  const handleConnectWallet = () => {
+    // Handle the logic to connect the user's wallet
+    // You can use web3.js or ethers.js to connect the wallet
+  };
+
+  const handleSwitchNetwork = () => {
+    // Handle the logic to switch the Ethereum network
+    // You can use web3.js or ethers.js to switch the network
+  };
+
+  const handleCompile = () => {
+    // Handle the logic to compile the generated code
+    // You can use a Solidity compiler library, such as solc, to compile the code
+  };
+
+  const handleDeploy = () => {
+    // Handle the logic to deploy the compiled contract
+    // You can use ethers.js or other libraries to deploy the contract
   };
 
   return (
-    <div>
-      <h1>Super Token Wizard</h1>
-
-      <label>
-        Token Name:
-        <input
-          type="text"
+    <div className="container">
+      <div className="options">
+        <h2>Token Options</h2>
+        <Input
+          placeholder="Token Name"
           value={tokenName}
           onChange={(e) => setTokenName(e.target.value)}
         />
-      </label>
 
-      <label>
-        Token Symbol:
-        <input
-          type="text"
+        <Input
+          placeholder="Token Symbol"
           value={tokenSymbol}
           onChange={(e) => setTokenSymbol(e.target.value)}
         />
-      </label>
 
-      <label>
-        Premint Amount:
-        <input
+        <Input
           type="number"
-          value={premintAmount}
-          onChange={(e) => setPremintAmount(e.target.value)}
+          placeholder="Premint Quantity"
+          value={premintQuantity}
+          onChange={(e) => setPremintQuantity(e.target.value)}
         />
-      </label>
 
-      <label>
-        Mintable:
-        <input
-          type="checkbox"
+        <Checkbox
           checked={isMintable}
           onChange={(e) => setIsMintable(e.target.checked)}
+        >
+          Mintable
+        </Checkbox>
+
+        <Checkbox
+          checked={isOwnable}
+          onChange={(e) => setIsOwnable(e.target.checked)}
+        >
+          Ownable
+        </Checkbox>
+
+        <Button type="primary" onClick={handleGenerateCode}>
+          Generate Code
+        </Button>
+      </div>
+
+      <div className="code">
+        <h2>Generated Code</h2>
+        <TextArea
+          value={generatedCode}
+          autoSize={{ minRows: 10 }}
+          readOnly
+          spellCheck="false"
+          autoCapitalize="off"
+          autoComplete="off"
+          autoCorrect="off"
         />
-      </label>
-
-      {isMintable && (
-        <label>
-          Ownable:
-          <input
-            type="checkbox"
-            checked={isOwnable}
-            onChange={(e) => setIsOwnable(e.target.checked)}
-          />
-        </label>
-      )}
-
-      <button onClick={generateContractCode}>Generate Contract Code</button>
-
-      {generatedCode && (
-        <div>
-          <h2>Generated Contract Code</h2>
-          <textarea
-            value={generatedCode}
-            rows={40}
-            cols={200}
-            wrap="hard"
-            readOnly />
-          <button onClick={copyToClipboard}>Copy to Remix</button>
+        <div className="code-buttons">
+          <Button onClick={handleCopyCode}>Copy Code</Button>
+          <Button onClick={handleOpenRemix}>Open in Remix</Button>
         </div>
-      )}
+      </div>
 
-      <label>
-        Select Network:
-        <select value={network} onChange={(e) => setNetwork(e.target.value)}>
-          <option value="mainnet">Mainnet</option>
-          <option value="ropsten">Ropsten</option>
-          <option value="rinkeby">Rinkeby</option>
-          {/* Add more network options as needed */}
-        </select>
-      </label>
+      <div className="actions">
+        <Button onClick={handleConnectWallet}>Connect Wallet</Button>
+        <Button onClick={handleSwitchNetwork}>Switch Network</Button>
+        <Button onClick={handleCompile}>Compile</Button>
+        <Button type="primary" onClick={handleDeploy}>
+          Deploy
+        </Button>
+      </div>
 
-      <button onClick={handleDeploy}>Deploy</button>
+      <style jsx>{`
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .container {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              display: flex;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        flex-direction: row;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
 
-      {deployedAddress && (
-        <div>
-          <h2>Deployed Address</h2>
-          <p>{deployedAddress}</p>
-        </div>
-      )}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        .options {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  flex: 1;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            padding: 20px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .code {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      flex: 2;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                padding: 20px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .code-buttons {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          margin-top: 10px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    display: flex;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              gap: 10px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              .actions {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        flex: 1;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  padding: 20px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            display: flex;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      justify-content: flex-end;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      .actions button {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                margin-left: 10px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              `}</style>
     </div>
   );
 };
