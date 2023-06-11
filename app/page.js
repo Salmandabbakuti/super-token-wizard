@@ -38,7 +38,7 @@ const SuperTokenWizard = () => {
   };
 
   const handleCopyCode = () => {
-    if (!generatedCode) return message.warning("No code found to copy");
+    if (!generatedCode) return message.warning("No code to copy");
     navigator.clipboard.writeText(generatedCode);
     message.success("Code copied to clipboard");
   };
@@ -105,88 +105,93 @@ const SuperTokenWizard = () => {
       </div>
       <div className="container">
         <div className="options">
-          <h2>Token Options</h2>
-          <Input
-            placeholder="Token Name"
-            value={wizardOptions?.tokenName}
-            onChange={handleWizardOptionsChange}
-          />
+          <div className="section">
+            <h3>Token Options</h3>
+            <Input
+              placeholder="Token Name"
+              value={wizardOptions?.tokenName}
+              onChange={handleWizardOptionsChange}
+            />
 
-          <Input
-            name="tokenSymbol"
-            placeholder="Token Symbol"
-            value={wizardOptions?.tokenSymbol}
-            onChange={handleWizardOptionsChange}
-          />
+            <Input
+              name="tokenSymbol"
+              placeholder="Token Symbol"
+              value={wizardOptions?.tokenSymbol}
+              onChange={handleWizardOptionsChange}
+            />
 
-          <Input
-            name="premintQuantity"
-            type="number"
-            placeholder="Premint Quantity"
-            value={wizardOptions?.premintQuantity}
-            onChange={handleWizardOptionsChange}
-          />
+            <Input
+              name="premintQuantity"
+              type="number"
+              placeholder="Premint Quantity"
+              value={wizardOptions?.premintQuantity}
+              onChange={handleWizardOptionsChange}
+            />
 
-          <Input
-            name="licenseIdentifier"
-            placeholder="License Identifier"
-            value={wizardOptions?.licenseIdentifier}
-            onChange={handleWizardOptionsChange}
-          />
+            <Input
+              name="licenseIdentifier"
+              placeholder="License Identifier"
+              value={wizardOptions?.licenseIdentifier}
+              onChange={handleWizardOptionsChange}
+            />
+          </div>
+          <div className="section">
+            <h3>Features</h3>
+            <Checkbox
+              checked={wizardOptions?.isMintable}
+              onChange={(e) => setWizardOptions({ ...wizardOptions, isMintable: e.target.checked })}
+            >
+              Mintable
+            </Checkbox>
 
-          <Checkbox
-            checked={wizardOptions?.isMintable}
-            onChange={(e) => setWizardOptions({ ...wizardOptions, isMintable: e.target.checked })}
-          >
-            Mintable
-          </Checkbox>
-
-          <Checkbox
-            checked={wizardOptions?.isOwnable}
-            onChange={(e) => setWizardOptions({ ...wizardOptions, isOwnable: e.target.checked })}
-          >
-            Ownable
-          </Checkbox>
-
-          <Button type="primary" onClick={handleGenerateCode}>
-            Generate Code
-          </Button>
-        </div>
-
-        <div className="code">
-          <TextArea
-            value={generatedCode}
-            autoSize={{ minRows: 10, maxRows: 80 }}
-            style={{
-              fontFamily: "monospace",
-              fontSize: "14px",
-              backgroundColor: "#282c34",
-              color: "#fff",
-              width: "100%",
-              height: "100%"
-            }}
-            readOnly
-            spellCheck="false"
-            autoCapitalize="off"
-            autoComplete="off"
-            autoCorrect="off"
-            rows={20}
-            cols={80}
-          />
-          <div className="code-buttons">
-            <Button onClick={handleCopyCode}>Copy Code</Button>
-            <Button onClick={handleOpenInRemix}>Open in Remix</Button>
-            <Button type="primary" onClick={handleCompile}>Compile</Button>
-            <Button type="primary" onClick={handleDeploy}>
-              Deploy
+            <Checkbox
+              checked={wizardOptions?.isOwnable}
+              onChange={(e) => setWizardOptions({ ...wizardOptions, isOwnable: e.target.checked })}
+            >
+              Ownable
+            </Checkbox>
+          </div>
+          <div className="section">
+            <Button type="primary" onClick={handleGenerateCode}>
+              Generate
             </Button>
-            {
-              contract && (
-                <Button type="primary" onClick={handleInitialize}>
-                  Initialize
-                </Button>
-              )
-            }
+          </div>
+
+          <div className="code">
+            <TextArea
+              value={generatedCode}
+              autoSize={{ minRows: 10, maxRows: 80 }}
+              style={{
+                fontFamily: "monospace",
+                fontSize: "14px",
+                backgroundColor: "#282c34",
+                color: "#fff",
+                width: "100%",
+                height: "100%"
+              }}
+              readOnly
+              spellCheck="false"
+              autoCapitalize="off"
+              autoComplete="off"
+              autoCorrect="off"
+              rows={20}
+              cols={80}
+            />
+            <div className="code-buttons">
+              <Button onClick={handleCopyCode}>Copy Code</Button>
+              <Button onClick={handleOpenInRemix}>Open in Remix</Button>
+              <Button type="primary" onClick={handleCompile}>Compile</Button>
+              <Button type="primary" onClick={handleDeploy}>
+                Deploy
+              </Button>
+              {
+                contract && (
+                  <Button type="primary" onClick={handleInitialize}>
+                    Initialize
+                  </Button>
+                )
+              }
+            </div>
           </div>
         </div>
       </div>
@@ -230,6 +235,10 @@ const SuperTokenWizard = () => {
 
         .options {
           flex: 1;
+          padding: 20px;
+        }
+
+        .section {
           padding: 20px;
         }
 
