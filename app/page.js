@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import { Input, Checkbox, Button, Typography } from "antd";
 import "antd/dist/antd.css";
