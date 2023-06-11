@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Input, Checkbox, Button, Typography, Layout, message } from "antd";
 import "antd/dist/antd.css";
+import Link from "next/link";
 
 import {
   mainContract,
@@ -179,7 +180,11 @@ const SuperTokenWizard = () => {
             />
             <div className="code-buttons">
               <Button onClick={handleCopyCode}>Copy Code</Button>
-              <Button onClick={handleOpenInRemix}>Open in Remix</Button>
+              <Link href={
+                `https://remix.ethereum.org/?#code=${btoa(generatedCode)}`
+              } target="_blank">
+                <Button>Open in Remix</Button>
+              </Link>
               <Button type="primary" onClick={handleCompile}>Compile</Button>
               <Button type="primary" onClick={handleDeploy}>
                 Deploy
