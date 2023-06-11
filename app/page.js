@@ -1,26 +1,35 @@
 "use client";
 import React, { useState } from "react";
-import { Input, Checkbox, Button, Typography } from "antd";
+import { Input, Checkbox, Button, Typography, Layout } from "antd";
 import "antd/dist/antd.css";
+
+import {
+  mainContract,
+  ownableImport,
+  mintFunction
+} from "./utils/contractTemplates";
 
 const { TextArea } = Input;
 const { Text } = Typography;
+const { Header, Footer, Sider, Content } = Layout;
 
 const SuperTokenWizard = () => {
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
-  const [premintQuantity, setPremintQuantity] = useState("");
+  const [premintQuantity, setPremintQuantity] = useState(1000);
+  const [licenseIdentifier, setLicenseIdentifier] = useState("MIT");
   const [isMintable, setIsMintable] = useState(false);
   const [isOwnable, setIsOwnable] = useState(false);
-  const [generatedCode, setGeneratedCode] = useState("aAD");
+  const [generatedCode, setGeneratedCode] = useState("");
 
   const handleGenerateCode = () => {
-    // Generate the contract code based on the selected options
-    // Store the generated code in the generatedCode state variable
-    // You can use the previous code generation logic here
-    const contractCode = `
-      // Your generated contract code here
-    `;
+    const contractCode = mainContract
+      .replace("$LICENSE_IDENTIFIER$", licenseIdentifier)
+      .replace("$OWNABLE_IMPORT$", isOwnable ? ownableImport : "")
+      .replace("$OWNABLE_INHERITANCE$", isOwnable ? ", Ownable" : "")
+      .replace("$PREMINT_QUANTITY$", premintQuantity)
+      .replace("$MINT_FUNCTION$", isMintable ? mintFunction : "")
+      .replace("$ONLY_OWNER$", isOwnable ? "onlyOwner" : "");
     setGeneratedCode(contractCode);
   };
 
@@ -58,17 +67,33 @@ const SuperTokenWizard = () => {
     <>
       <div className="navbar">
         <div className="logo">
-          <img src="/path/to/logo.png" alt="Logo" />
-          <Text strong>Super Token Wizard</Text>
+          <img
+            src="https://global-uploads.webflow.com/63bbb06bcc33535ccdd1b9ef/63bbb06bcc33536b3fd1bc6e_Diamonds%20Symbol%20Grey.svg"
+            alt="Logo"
+            className="logo-image"
+          />
+          <Text strong className="logo-text">
+            SuperToken Wizard
+          </Text>
         </div>
         <div className="navbar-buttons">
-          <Button onClick={handleConnectWallet}>Connect Wallet</Button>
-          <Button onClick={handleSwitchNetwork}>Switch Network</Button>
+          <Button
+            type="text"
+            // icon={<WalletOutlined />}
+            onClick={handleConnectWallet}
+          >
+            Connect Wallet
+          </Button>
+          <Button
+            type="text"
+            // icon={<SwapOutlined />}
+            onClick={handleSwitchNetwork}
+          >
+            Switch Network
+          </Button>
         </div>
       </div>
       <div className="container">
-
-
         <div className="options">
           <h2>Token Options</h2>
           <Input
@@ -88,6 +113,12 @@ const SuperTokenWizard = () => {
             placeholder="Premint Quantity"
             value={premintQuantity}
             onChange={(e) => setPremintQuantity(e.target.value)}
+          />
+
+          <Input
+            placeholder="License Identifier"
+            value={licenseIdentifier}
+            onChange={(e) => setLicenseIdentifier(e.target.value)}
           />
 
           <Checkbox
@@ -119,7 +150,7 @@ const SuperTokenWizard = () => {
               backgroundColor: "#282c34",
               color: "#fff",
               width: "100%",
-              height: "100%",
+              height: "100%"
             }}
             readOnly
             spellCheck="false"
@@ -138,13 +169,9 @@ const SuperTokenWizard = () => {
             </Button>
           </div>
         </div>
+      </div>
 
-        <style jsx>{`
-        .container {
-          display: flex;
-          flex-direction: row;
-        }
-
+      <style jsx>{`
         .navbar {
           position: sticky;
           top: 0;
@@ -152,10 +179,6 @@ const SuperTokenWizard = () => {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          justify-content: space-between;
-          align-items: center;
-          justify-content: space-between;
-          align-items: center;
           padding: 20px;
           background-color: #f5f5f5;
         }
@@ -165,15 +188,24 @@ const SuperTokenWizard = () => {
           align-items: center;
         }
 
-        .logo img {
+        .logo-image {
           width: 40px;
           height: 40px;
           margin-right: 10px;
         }
 
+        .logo-text {
+          font-size: 18px;
+        }
+
         .navbar-buttons {
           display: flex;
           gap: 10px;
+        }
+
+        .container {
+          display: flex;
+          flex-direction: row;
         }
 
         .options {
@@ -203,7 +235,6 @@ const SuperTokenWizard = () => {
           margin-left: 10px;
         }
       `}</style>
-      </div>
     </>
   );
 };
