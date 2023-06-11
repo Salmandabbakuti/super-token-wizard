@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Input, Checkbox, Button, Typography, Layout } from "antd";
+import { Input, Checkbox, Button, Typography, Layout, message } from "antd";
 import "antd/dist/antd.css";
 
 import {
@@ -14,31 +14,36 @@ const { Text } = Typography;
 const { Header, Footer, Sider, Content } = Layout;
 
 const SuperTokenWizard = () => {
-  const [tokenName, setTokenName] = useState("");
-  const [tokenSymbol, setTokenSymbol] = useState("");
-  const [premintQuantity, setPremintQuantity] = useState(1000);
-  const [licenseIdentifier, setLicenseIdentifier] = useState("MIT");
-  const [isMintable, setIsMintable] = useState(false);
-  const [isOwnable, setIsOwnable] = useState(false);
+  const [wizardOptions, setWizardOptions] = useState({
+    premintQuantity: 1000,
+    licenseIdentifier: "MIT"
+  });
   const [generatedCode, setGeneratedCode] = useState("");
+  const [compiledOutput, setCompiledOutput] = useState(null);
+  const [contract, setContract] = useState(null);
+
+  const handleWizardOptionsChange = (e) => {
+    setWizardOptions({ ...wizardOptions, [e.target.name]: e.target.value });
+  };
 
   const handleGenerateCode = () => {
     const contractCode = mainContract
-      .replace("$LICENSE_IDENTIFIER$", licenseIdentifier)
-      .replace("$OWNABLE_IMPORT$", isOwnable ? ownableImport : "")
-      .replace("$OWNABLE_INHERITANCE$", isOwnable ? ", Ownable" : "")
-      .replace("$PREMINT_QUANTITY$", premintQuantity)
-      .replace("$MINT_FUNCTION$", isMintable ? mintFunction : "")
-      .replace("$ONLY_OWNER$", isOwnable ? "onlyOwner" : "");
+      .replace("$LICENSE_IDENTIFIER$", wizardOptions.licenseIdentifier)
+      .replace("$OWNABLE_IMPORT$", wizardOptions.isOwnable ? ownableImport : "")
+      .replace("$OWNABLE_INHERITANCE$", wizardOptions.isOwnable ? ", Ownable" : "")
+      .replace("$PREMINT_QUANTITY$", wizardOptions.premintQuantity)
+      .replace("$MINT_FUNCTION$", wizardOptions.isMintable ? mintFunction : "")
+      .replace("$ONLY_OWNER$", wizardOptions.isOwnable ? "onlyOwner" : "");
     setGeneratedCode(contractCode);
   };
 
   const handleCopyCode = () => {
-    // Copy the generated code to the clipboard
-    // You can use the Clipboard API or a third-party library here
+    if (!generatedCode) return message.warning("No code found to copy");
+    navigator.clipboard.writeText(generatedCode);
+    message.success("Code copied to clipboard");
   };
 
-  const handleOpenRemix = () => {
+  const handleOpenInRemix = () => {
     // Open the generated code in Remix IDE
     // You can redirect the user to the Remix IDE URL with the generated code as a parameter
   };
@@ -61,6 +66,11 @@ const SuperTokenWizard = () => {
   const handleDeploy = () => {
     // Handle the logic to deploy the compiled contract
     // You can use ethers.js or other libraries to deploy the contract
+  };
+
+  const handleInitialize = () => {
+    // Handle the logic to initialize protocol
+    // You can use ethers.js or other libraries to interact with contract
   };
 
   return (
@@ -98,39 +108,42 @@ const SuperTokenWizard = () => {
           <h2>Token Options</h2>
           <Input
             placeholder="Token Name"
-            value={tokenName}
-            onChange={(e) => setTokenName(e.target.value)}
+            value={wizardOptions?.tokenName}
+            onChange={handleWizardOptionsChange}
           />
 
           <Input
+            name="tokenSymbol"
             placeholder="Token Symbol"
-            value={tokenSymbol}
-            onChange={(e) => setTokenSymbol(e.target.value)}
+            value={wizardOptions?.tokenSymbol}
+            onChange={handleWizardOptionsChange}
           />
 
           <Input
+            name="premintQuantity"
             type="number"
             placeholder="Premint Quantity"
-            value={premintQuantity}
-            onChange={(e) => setPremintQuantity(e.target.value)}
+            value={wizardOptions?.premintQuantity}
+            onChange={handleWizardOptionsChange}
           />
 
           <Input
+            name="licenseIdentifier"
             placeholder="License Identifier"
-            value={licenseIdentifier}
-            onChange={(e) => setLicenseIdentifier(e.target.value)}
+            value={wizardOptions?.licenseIdentifier}
+            onChange={handleWizardOptionsChange}
           />
 
           <Checkbox
-            checked={isMintable}
-            onChange={(e) => setIsMintable(e.target.checked)}
+            checked={wizardOptions?.isMintable}
+            onChange={(e) => setWizardOptions({ ...wizardOptions, isMintable: e.target.checked })}
           >
             Mintable
           </Checkbox>
 
           <Checkbox
-            checked={isOwnable}
-            onChange={(e) => setIsOwnable(e.target.checked)}
+            checked={wizardOptions?.isOwnable}
+            onChange={(e) => setWizardOptions({ ...wizardOptions, isOwnable: e.target.checked })}
           >
             Ownable
           </Checkbox>
@@ -162,11 +175,18 @@ const SuperTokenWizard = () => {
           />
           <div className="code-buttons">
             <Button onClick={handleCopyCode}>Copy Code</Button>
-            <Button onClick={handleOpenRemix}>Open in Remix</Button>
-            <Button onClick={handleCompile}>Compile</Button>
+            <Button onClick={handleOpenInRemix}>Open in Remix</Button>
+            <Button type="primary" onClick={handleCompile}>Compile</Button>
             <Button type="primary" onClick={handleDeploy}>
               Deploy
             </Button>
+            {
+              contract && (
+                <Button type="primary" onClick={handleInitialize}>
+                  Initialize
+                </Button>
+              )
+            }
           </div>
         </div>
       </div>
