@@ -17,7 +17,9 @@ import compiledOutput from "./utils/MyToken.json";
 const { TextArea } = Input;
 const { Text } = Typography;
 
-const SuperTokenWizard = () => {
+const SUPERTOKEN_FACTORY_ADDRESS = "0xb798553db6eb3d3c56912378409370145e97324b"; // Mumbai testnet
+
+export default function Home() {
   const [wizardOptions, setWizardOptions] = useState({
     premintQuantity: 1000,
     licenseIdentifier: "MIT",
@@ -44,7 +46,7 @@ const SuperTokenWizard = () => {
         "$OWNABLE_INHERITANCE$",
         wizardOptions.isOwnable ? ", Ownable" : ""
       )
-      .replace("$PREMINT_QUANTITY$", wizardOptions.premintQuantity)
+      .replace("$PREMINT_QUANTITY$", `${wizardOptions?.premintQuantity} * 10 ** 18`)
       .replace("$MINT_FUNCTION$", wizardOptions.isMintable ? mintFunction : "")
       .replace("$ONLY_OWNER$", wizardOptions.isOwnable ? "onlyOwner" : "");
     setGeneratedCode(contractCode);
@@ -158,7 +160,7 @@ const SuperTokenWizard = () => {
       return message.error("Please set token name and symbol");
     try {
       const tx = await contract.initialize(
-        contract.address,
+        SUPERTOKEN_FACTORY_ADDRESS,
         wizardOptions?.tokenName,
         wizardOptions?.tokenSymbol
       );
@@ -334,5 +336,3 @@ const SuperTokenWizard = () => {
     </>
   );
 };
-
-export default SuperTokenWizard;
