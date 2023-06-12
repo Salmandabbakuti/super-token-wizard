@@ -2,7 +2,15 @@
 import React, { useState } from "react";
 import { Web3Provider } from "@ethersproject/providers";
 import { ContractFactory } from "@ethersproject/contracts";
-import { Input, Checkbox, Button, Typography, Layout, message } from "antd";
+import {
+  Input,
+  Checkbox,
+  Button,
+  Typography,
+  Layout,
+  message,
+  Select
+} from "antd";
 import "antd/dist/antd.css";
 import Link from "next/link";
 
@@ -19,20 +27,55 @@ const { Text } = Typography;
 
 const SUPERTOKEN_FACTORY_ADDRESS = "0xb798553db6eb3d3c56912378409370145e97324b"; // Mumbai testnet
 
+const chains = {
+  "80001": {
+    chainId: "0x13881",
+    chainName: "Mumbai Testnet",
+    nativeCurrency: {
+      name: "MATIC",
+      symbol: "MATIC",
+      decimals: 18
+    },
+    rpcUrls: [
+      "https://matic-mumbai.chainstacklabs.com",
+      "https://rpc-mumbai.maticvigil.com"
+    ],
+    blockExplorerUrls: ["https://mumbai.polygonscan.com"]
+  },
+  "137": {
+    chainId: "0x89",
+    chainName: "Polygon Mainnet",
+    nativeCurrency: {
+      name: "MATIC",
+      symbol: "MATIC",
+      decimals: 18
+    },
+    rpcUrls: [
+      "https://rpc-mainnet.maticvigil.com",
+      "https://matic-mainnet.chainstacklabs.com"
+    ],
+    blockExplorerUrls: ["https://polygonscan.com"]
+  },
+  "5": {
+    chainId: "0x5",
+    chainName: "Goerli",
+  }
+};
+
 export default function Home() {
   const [wizardOptions, setWizardOptions] = useState({
     premintQuantity: 1000,
     licenseIdentifier: "MIT",
     tokenName: "",
-    tokenSymbol: "",
+    tokenSymbol: ""
   });
   const [generatedCode, setGeneratedCode] = useState("");
   // const [compiledOutput, setCompiledOutput] = useState(null);
   const [provider, setProvider] = useState(null);
   const [account, setAccount] = useState(null);
   const [contract, setContract] = useState(null);
-  const [deployedContractAddress, setDeployedContractAddress] = useState("");
-  const [transactionHash, setTransactionHash] = useState("");
+  const [logMessage, setLogMessage] = useState("");
+  const [selectedChainId, setSelectedChainId] = useState("80001");
 
   const handleWizardOptionsChange = (e) => {
     setWizardOptions({ ...wizardOptions, [e.target.name]: e.target.value });
@@ -46,7 +89,10 @@ export default function Home() {
         "$OWNABLE_INHERITANCE$",
         wizardOptions.isOwnable ? ", Ownable" : ""
       )
-      .replace("$PREMINT_QUANTITY$", `${wizardOptions?.premintQuantity} * 10 ** 18`)
+      .replace(
+        "$PREMINT_QUANTITY$",
+        `${wizardOptions?.premintQuantity} * 10 ** 18`
+      )
       .replace("$MINT_FUNCTION$", wizardOptions.isMintable ? mintFunction : "")
       .replace("$ONLY_OWNER$", wizardOptions.isOwnable ? "onlyOwner" : "");
     setGeneratedCode(contractCode);
@@ -66,50 +112,14 @@ export default function Home() {
       console.log("Using account: ", accounts[0]);
       const provider = new Web3Provider(window.ethereum);
       const { chainId } = await provider.getNetwork();
-      if (chainId !== 80001) {
-        message.info("Switching to mumbai testnet");
-        // switch to the mumbai testnet
-        await window.ethereum
-          .request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x13881" }]
-          })
-          .catch(async (err) => {
-            // This error code indicates that the chain has not been added to MetaMask.
-            console.log("err on switch", err);
-            if (err.code === 4902) {
-              message.info("Adding mumbai testnet to metamask");
-              await window.ethereum
-                .request({
-                  method: "wallet_addEthereumChain",
-                  params: [
-                    {
-                      chainId: "0x13881",
-                      chainName: "Polygon Mumbai Testnet",
-                      nativeCurrency: {
-                        name: "MATIC",
-                        symbol: "MATIC",
-                        decimals: 18
-                      },
-                      rpcUrls: [
-                        "https://matic-mumbai.chainstacklabs.com",
-                        "https://rpc-mumbai.maticvigil.com"
-                      ],
-                      blockExplorerUrls: ["https://mumbai.polygonscan.com"]
-                    }
-                  ]
-                })
-                .then(() => message.info("Switched to mumbai testnet"))
-                .catch((err) => {
-                  message.error("Error adding mumbai testnet to metamask");
-                  console.error(err);
-                });
-            }
-          });
-      }
       console.log("chainId:", chainId);
+      // set selected chainid to the one user is connected to
+      const selectedChain = chains[chainId];
+      setSelectedChainId(selectedChain?.chainName || "Unsupported chain");
+      if (!selectedChain) return message.error("Unsupported chain. Please switch to supported chain");
       setAccount(accounts[0]);
       setProvider(provider);
+      message.success("Wallet connected");
     } else {
       console.warn("Please use web3 enabled browser");
       message.warning(
@@ -118,9 +128,46 @@ export default function Home() {
     }
   };
 
-  const handleSwitchNetwork = () => {
-    // Handle the logic to switch the Ethereum network
-    // You can use web3.js or ethers.js to switch the network
+  const handleSwitchChain = async () => {
+    console.log("selectedChainId", selectedChainId);
+    const selectedChain = chains[selectedChainId];
+    if (!selectedChain) return message.error("Unsupported chain selected");
+    if (window?.ethereum) {
+      window.ethereum
+        .request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: selectedChain.chainId }]
+        })
+        .then(() => message.info(`Switched to ${selectedChain.chainName}`))
+        .catch((err) => {
+          // This error code indicates that the chain has not been added to MetaMask.
+          console.log("err on switch", err);
+          if (err.code === 4902) {
+            message.info(`Adding ${selectedChain.chainName} to metamask`);
+            window.ethereum
+              .request({
+                method: "wallet_addEthereumChain",
+                params: [selectedChain]
+              })
+              .then(() =>
+                message.info(`Switched to ${selectedChain.chainName}`)
+              )
+              .catch((err) => {
+                message.error(`Error adding ${selectedChain.chainName}`);
+                console.error(err);
+              });
+          }
+        });
+      const provider = new Web3Provider(window.ethereum);
+      const { chainId } = await provider.getNetwork();
+      console.log("switched chainId:", chainId);
+      setProvider(provider);
+    } else {
+      console.warn("Please use web3 enabled browser");
+      message.warning(
+        "Please install Metamask or any other web3 enabled browser"
+      );
+    }
   };
 
   const handleCompile = () => {
@@ -139,9 +186,11 @@ export default function Home() {
         provider.getSigner()
       );
       const contract = await contractFactory.deploy();
-      setTransactionHash(contract.deployTransaction.hash);
+      setLogMessage(
+        `Contract being Deployed.Transaction hash: ${contract.deployTransaction.hash}`
+      );
       await contract.deployed();
-      setDeployedContractAddress(contract.address);
+      setLogMessage(`Contract deployed at address: ${contract.address}`);
       setContract(contract);
       message.success("Contract deployed successfully");
     } catch (err) {
@@ -164,7 +213,7 @@ export default function Home() {
         wizardOptions?.tokenName,
         wizardOptions?.tokenSymbol
       );
-      setTransactionHash(tx.hash);
+      setLogMessage(`Contract being Initialized.Transaction hash: ${tx.hash}`);
       await tx.wait();
       message.success("Contract initialized successfully");
     } catch (err) {
@@ -192,20 +241,22 @@ export default function Home() {
           {account ? (
             <span>{account.slice(0, 8) + "..." + account.slice(-5)}</span>
           ) : (
-            <Button
-              type="text"
-              // icon={<WalletOutlined />}
-              onClick={handleConnectWallet}
-            >
+            <Button type="default" style={{}} onClick={handleConnectWallet}>
               Connect Wallet
             </Button>
           )}
-          <Button
-            type="text"
-            // icon={<SwapOutlined />}
-            onClick={handleSwitchNetwork}
+          <Select
+            name="chainId"
+            id="chainId"
+            value={selectedChainId}
+            onChange={(value) => setSelectedChainId(value)}
           >
-            Switch Network
+            <Select.Option value="80001">Mumbai</Select.Option>
+            <Select.Option value="137">Polygon</Select.Option>
+            <Select.Option value="5">Goerli</Select.Option>
+          </Select>
+          <Button type="default" onClick={handleSwitchChain}>
+            Switch
           </Button>
         </div>
       </div>
@@ -317,22 +368,13 @@ export default function Home() {
               )}
             </div>
           </div>
-          <div className="log-box">
-            {deployedContractAddress && (
-              <div>
-                <strong>Deployed Contract Address:</strong>
-                <p>{deployedContractAddress}</p>
-              </div>
-            )}
-            {transactionHash && (
-              <div>
-                <strong>Transaction Hash:</strong>
-                <p>{transactionHash}</p>
-              </div>
-            )}
-          </div>
+          {logMessage && (
+            <div className="log-box">
+              <p>{logMessage}</p>
+            </div>
+          )}
         </div>
       </div>
     </>
   );
-};
+}
