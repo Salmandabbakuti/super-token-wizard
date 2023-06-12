@@ -7,7 +7,6 @@ import {
   Checkbox,
   Button,
   Typography,
-  Layout,
   message,
   Select
 } from "antd";
@@ -25,7 +24,11 @@ import compiledOutput from "./utils/MyToken.json";
 const { TextArea } = Input;
 const { Text } = Typography;
 
-const SUPERTOKEN_FACTORY_ADDRESS = "0xb798553db6eb3d3c56912378409370145e97324b"; // Mumbai testnet
+const superTokenFactoryAddresses = {
+  "80001": "0xb798553db6eb3d3c56912378409370145e97324b",
+  "137": "0x2C90719f25B10Fc5646c82DA3240C76Fa5BcCF34",
+  "5": "0x94f26B4c8AD12B18c12f38E878618f7664bdcCE2"
+};
 
 const chains = {
   "80001": {
@@ -207,9 +210,11 @@ export default function Home() {
       /^\s*$/.test(wizardOptions?.tokenSymbol)
     )
       return message.error("Please set token name and symbol");
+    const { chainId } = await provider.getNetwork();
+    const factoryAddress = superTokenFactoryAddresses[chainId];
     try {
       const tx = await contract.initialize(
-        SUPERTOKEN_FACTORY_ADDRESS,
+        factoryAddress,
         wizardOptions?.tokenName,
         wizardOptions?.tokenSymbol
       );
