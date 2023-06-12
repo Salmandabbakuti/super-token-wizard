@@ -3,6 +3,10 @@ import React, { useState } from "react";
 import { Web3Provider } from "@ethersproject/providers";
 import { ContractFactory } from "@ethersproject/contracts";
 import {
+  getCompilerVersions,
+  solidityCompiler,
+} from '@agnostico/browser-solidity-compiler';
+import {
   Input,
   Checkbox,
   Button,
@@ -73,7 +77,7 @@ export default function Home() {
     tokenSymbol: ""
   });
   const [generatedCode, setGeneratedCode] = useState("");
-  // const [compiledOutput, setCompiledOutput] = useState(null);
+  const [compiledOutput, setCompiledOutput] = useState(null);
   const [provider, setProvider] = useState(null);
   const [account, setAccount] = useState(null);
   const [contract, setContract] = useState(null);
@@ -173,9 +177,36 @@ export default function Home() {
     }
   };
 
-  const handleCompile = () => {
-    // Handle the logic to compile the generated code
-    // You can use a Solidity compiler library, such as solc, to compile the code
+  const handleCompile = async () => {
+    if (!generatedCode) return message.error("Please generate the code first");
+    // const releases = await getCompilerVersions();
+    // console.log("releases", releases);
+    try {
+      const compiled = await solidityCompiler({
+        version: "https://binaries.soliditylang.org/emscripten-wasm32/solc-emscripten-wasm32-v0.8.0+commit.c7dfd78e.js",
+        contractBody: generatedCode,
+        options: {
+          optimizer: {
+            enabled: false,
+            runs: 200
+          }
+        },
+      });
+      console.log("compiled", compiled);
+      if (compiled?.errors) {
+        console.error("Error compiling code", compiled.errors);
+        const errors = compiled?.errors?.map((err) => err.formattedMessage);
+        return message.error(errors.join("\n"));
+      }
+      setCompiledOutput({
+        abi: compiled?.contracts?.Compiled_Contracts["MyToken"]?.abi,
+        bytecode: compiled?.contracts?.Compiled_Contracts["MyToken"]?.evm?.bytecode?.object
+      });
+      message.success("Code compiled successfully");
+    } catch (err) {
+      console.error("Error compiling code", err);
+      message.error("Something went wrong while compiling the code");
+    }
   };
 
   const handleDeploy = async () => {

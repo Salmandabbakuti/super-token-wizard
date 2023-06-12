@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@agnostico/browser-solidity-compiler": "^0.1.1",
     "@ethersproject/contracts": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "antd": "4.23.2",
