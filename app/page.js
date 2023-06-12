@@ -298,9 +298,11 @@ const SuperTokenWizard = () => {
       <div className="navbar">
         <div className="logo">
           <img
-            src="https://global-uploads.webflow.com/63bbb06bcc33535ccdd1b9ef/63bbb06bcc33536b3fd1bc6e_Diamonds%20Symbol%20Grey.svg"
+            src="/wizard_logo.svg"
             alt="Logo"
             className="logo-image"
+            width={40}
+            height={40}
           />
           <Text strong className="logo-text">
             SuperToken Wizard
