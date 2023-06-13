@@ -31,7 +31,8 @@ const { Text } = Typography;
 const superTokenFactoryAddresses = {
   "80001": "0xb798553db6eb3d3c56912378409370145e97324b",
   "137": "0x2C90719f25B10Fc5646c82DA3240C76Fa5BcCF34",
-  "5": "0x94f26B4c8AD12B18c12f38E878618f7664bdcCE2"
+  "5": "0x94f26B4c8AD12B18c12f38E878618f7664bdcCE2",
+  "1": "0x0422689cc4087b6B7280e0a7e7F655200ec86Ae1"
 };
 
 const chains = {
@@ -65,8 +66,12 @@ const chains = {
   },
   "5": {
     chainId: "0x5",
-    chainName: "Goerli",
-  }
+    chainName: "Goerli"
+  },
+  "1": {
+    chainId: "0x1",
+    chainName: "Ethereum Mainnet"
+  },
 };
 
 export default function Home() {
@@ -122,7 +127,7 @@ export default function Home() {
       console.log("chainId:", chainId);
       // set selected chainid to the one user is connected to
       const selectedChain = chains[chainId];
-      setSelectedChainId(selectedChain?.chainName || "Unsupported chain");
+      setSelectedChainId(selectedChain ? chainId?.toString() : "Unsupported chain");
       if (!selectedChain) return message.error("Unsupported chain. Please switch to supported chain");
       setAccount(accounts[0]);
       setProvider(provider);
@@ -196,7 +201,7 @@ export default function Home() {
       if (compiled?.errors) {
         console.error("Error compiling code", compiled.errors);
         const errors = compiled?.errors?.map((err) => err.formattedMessage);
-        return message.error(errors.join("\n"));
+        return message.error(errors.join(", "));
       }
       setCompiledOutput({
         abi: compiled?.contracts?.Compiled_Contracts["MyToken"]?.abi,
@@ -287,9 +292,13 @@ export default function Home() {
             value={selectedChainId}
             onChange={(value) => setSelectedChainId(value)}
           >
-            <Select.Option value="80001">Mumbai</Select.Option>
-            <Select.Option value="137">Polygon</Select.Option>
-            <Select.Option value="5">Goerli</Select.Option>
+            {
+              Object.keys(chains).map((chainId) => (
+                <Select.Option key={chainId} value={chainId}>
+                  {chains[chainId]?.chainName?.split(" ")[0]}
+                </Select.Option>
+              ))
+            }
           </Select>
           <Button type="default" onClick={handleSwitchChain}>
             Switch
