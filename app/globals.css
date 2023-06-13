@@ -127,23 +127,29 @@ a {
 .container {
   display: flex;
   flex-direction: column;
+  border: 1px solid #ccc;
 }
 
 .options {
-  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
   padding: 20px;
 }
 
 .section {
-  padding: 20px;
+  flex: 1 1 100%;
+  margin-bottom: 5px;
+  padding: 10px;
 }
 
 .code {
   flex: 2;
   padding: 20px;
+  height: max-content;
 }
 
 .code-buttons {
+  flex-wrap: wrap;
   margin-top: 10px;
   display: flex;
   gap: 10px;
@@ -166,9 +172,21 @@ a {
   flex: 1;
   padding: 20px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .actions button {
-  margin-left: 10px;
+  margin-left: 20px;
+}
+
+@media (min-width: 768px) {
+  .options {
+    flex-wrap: nowrap;
+  }
+
+  .section {
+    flex: 1;
+    margin-right: 20px;
+  }
 }

@@ -12,7 +12,8 @@ import {
   Button,
   Typography,
   message,
-  Select
+  Select,
+  Space
 } from "antd";
 import "antd/dist/antd.css";
 import Link from "next/link";
@@ -317,7 +318,7 @@ export default function Home() {
       </div>
       <div className="container">
         <div className="options">
-          <div className="section">
+          <div className="section input">
             <h3>Token Options</h3>
             <Input
               name="tokenName"
@@ -350,7 +351,37 @@ export default function Home() {
               minLength={42}
               onChange={handleWizardOptionsChange}
             />
+          </div>
+          <div className="section features">
+            <h3>Features</h3>
+            <Space direction="vertical">
+              <Checkbox
+                checked={wizardOptions?.isMintable}
+                onChange={(e) =>
+                  setWizardOptions({
+                    ...wizardOptions,
+                    isMintable: e.target.checked
+                  })
+                }
+              >
+                Mintable
+              </Checkbox>
 
+              <Checkbox
+                checked={wizardOptions?.isOwnable}
+                onChange={(e) =>
+                  setWizardOptions({
+                    ...wizardOptions,
+                    isOwnable: e.target.checked
+                  })
+                }
+              >
+                Ownable
+              </Checkbox>
+            </Space>
+          </div>
+          <div className="section miscellaneous">
+            <h3>Miscellaneous</h3>
             <Input
               name="licenseIdentifier"
               placeholder="License Identifier"
@@ -358,87 +389,62 @@ export default function Home() {
               onChange={handleWizardOptionsChange}
             />
           </div>
-          <div className="section">
-            <h3>Features</h3>
-            <Checkbox
-              checked={wizardOptions?.isMintable}
-              onChange={(e) =>
-                setWizardOptions({
-                  ...wizardOptions,
-                  isMintable: e.target.checked
-                })
-              }
-            >
-              Mintable
-            </Checkbox>
-
-            <Checkbox
-              checked={wizardOptions?.isOwnable}
-              onChange={(e) =>
-                setWizardOptions({
-                  ...wizardOptions,
-                  isOwnable: e.target.checked
-                })
-              }
-            >
-              Ownable
-            </Checkbox>
-          </div>
-          <div className="section">
-            <Button type="primary" onClick={handleGenerateCode}>
-              Generate
-            </Button>
-          </div>
-
-          <div className="code">
-            <TextArea
-              value={generatedCode}
-              autoSize={{ minRows: 10, maxRows: 80 }}
-              style={{
-                fontFamily: "monospace",
-                fontSize: "14px",
-                backgroundColor: "#282c34",
-                color: "#fff",
-                width: "100%",
-                height: "100%"
-              }}
-              readOnly
-              spellCheck="false"
-              autoCapitalize="off"
-              autoComplete="off"
-              autoCorrect="off"
-              rows={20}
-              cols={80}
-            />
-            <div className="code-buttons">
-              <Button onClick={handleCopyCode}>Copy Code</Button>
-              <Link
-                href={`https://remix.ethereum.org/?#code=${btoa(
-                  generatedCode
-                )}`}
-                target="_blank"
-              >
-                <Button>Open in Remix</Button>
-              </Link>
-              <Button type="primary" onClick={handleCompile}>
-                Compile
-              </Button>
-              <Button type="primary" onClick={handleDeploy}>
-                Deploy
-              </Button>
-              {contract && (
-                <Button type="primary" onClick={handleInitialize}>
-                  Initialize
-                </Button>
-              )}
-            </div>
-          </div>
-          {logMessage && (
-            <div className="log-box">
-              <p>{logMessage}</p>
-            </div>
-          )}
         </div>
+
+        <div className="actions">
+          <Button type="primary" onClick={handleGenerateCode}>
+            Generate
+          </Button>
+        </div>
+
+        <div className="code">
+          <TextArea
+            value={generatedCode}
+            autoSize={{ minRows: 10, maxRows: 80 }}
+            style={{
+              fontFamily: "monospace",
+              fontSize: "14px",
+              backgroundColor: "#282c34",
+              color: "#fff",
+              width: "100%",
+              height: "100%"
+            }}
+            readOnly
+            spellCheck="false"
+            autoCapitalize="off"
+            autoComplete="off"
+            autoCorrect="off"
+            rows={20}
+            cols={80}
+          />
+          <div className="code-buttons">
+            <Button onClick={handleCopyCode}>Copy Code</Button>
+            <Link
+              href={`https://remix.ethereum.org/?#code=${btoa(
+                generatedCode
+              )}`}
+              target="_blank"
+            >
+              <Button>Open in Remix</Button>
+            </Link>
+            <Button type="primary" onClick={handleCompile}>
+              Compile
+            </Button>
+            <Button type="primary" onClick={handleDeploy}>
+              Deploy
+            </Button>
+            {contract && (
+              <Button type="primary" onClick={handleInitialize}>
+                Initialize
+              </Button>
+            )}
+          </div>
+        </div>
+        {logMessage && (
+          <div className="log-box">
+            <p>{logMessage}</p>
+          </div>
+        )}
       </div>
     </>
   );
