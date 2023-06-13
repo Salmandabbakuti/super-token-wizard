@@ -82,7 +82,7 @@ export default function Home() {
     tokenSymbol: ""
   });
   const [generatedCode, setGeneratedCode] = useState("");
-  const [compiledOutput, setCompiledOutput] = useState(null);
+  // const [compiledOutput, setCompiledOutput] = useState(null);
   const [provider, setProvider] = useState(null);
   const [account, setAccount] = useState(null);
   const [contract, setContract] = useState(null);
@@ -226,6 +226,7 @@ export default function Home() {
     if (!provider) return message.error("Please connect your wallet first");
     if (!compiledOutput?.abi?.length)
       return message.error("Please compile the code first");
+    message.info("Since compiler is not ready, using precompiled artifacts to deploy for demo purpose");
     try {
       const contractFactory = new ContractFactory(
         compiledOutput.abi,
