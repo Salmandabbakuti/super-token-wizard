@@ -124,7 +124,7 @@ export default function Home() {
       console.log("Using account: ", accounts[0]);
       const provider = new Web3Provider(window.ethereum);
       const { chainId } = await provider.getNetwork();
-      console.log("chainId:", chainId);
+      console.log("current chainId:", chainId);
       // set selected chainid to the one user is connected to
       const selectedChain = chains[chainId];
       setSelectedChainId(selectedChain ? chainId?.toString() : "Unsupported chain");
@@ -140,7 +140,7 @@ export default function Home() {
     }
   };
 
-  const handleSwitchChain = async () => {
+  const handleSwitchChain = async (selectedChainId) => {
     console.log("selectedChainId", selectedChainId);
     const selectedChain = chains[selectedChainId];
     if (!selectedChain) return message.error("Unsupported chain selected");
@@ -291,6 +291,7 @@ export default function Home() {
             id="chainId"
             value={selectedChainId}
             onChange={(value) => setSelectedChainId(value)}
+            onSelect={(value) => handleSwitchChain(value)}
           >
             {
               Object.keys(chains).map((chainId) => (
@@ -300,9 +301,6 @@ export default function Home() {
               ))
             }
           </Select>
-          <Button type="default" onClick={handleSwitchChain}>
-            Switch
-          </Button>
         </div>
       </div>
       <div className="container">
