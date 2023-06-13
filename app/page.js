@@ -85,7 +85,7 @@ export default function Home() {
   const [provider, setProvider] = useState(null);
   const [account, setAccount] = useState(null);
   const [contract, setContract] = useState(null);
-  const [logMessage, setLogMessage] = useState("fhgghf");
+  const [logMessage, setLogMessage] = useState("");
   const [selectedChainId, setSelectedChainId] = useState("80001");
 
   const handleWizardOptionsChange = (e) => {
