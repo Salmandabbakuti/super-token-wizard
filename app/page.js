@@ -14,7 +14,7 @@ import {
   message,
   Select,
   Space,
-  Form
+  Layout
 } from "antd";
 import "antd/dist/antd.css";
 import Link from "next/link";
@@ -26,9 +26,6 @@ import {
 } from "./utils/contractTemplates";
 
 import compiledOutput from "./utils/MyToken.json";
-
-const { TextArea } = Input;
-const { Text } = Typography;
 
 const superTokenFactoryAddresses = {
   "80001": "0xb798553db6eb3d3c56912378409370145e97324b",
@@ -88,7 +85,7 @@ export default function Home() {
   const [provider, setProvider] = useState(null);
   const [account, setAccount] = useState(null);
   const [contract, setContract] = useState(null);
-  const [logMessage, setLogMessage] = useState("");
+  const [logMessage, setLogMessage] = useState("fhgghf");
   const [selectedChainId, setSelectedChainId] = useState("80001");
 
   const handleWizardOptionsChange = (e) => {
@@ -285,9 +282,9 @@ export default function Home() {
             width={40}
             height={40}
           />
-          <Text strong className="logo-text">
+          <Typography.Text strong className="logo-text">
             SuperToken Wizard
-          </Text>
+          </Typography.Text>
         </div>
         <div className="navbar-buttons">
           {account ? (
@@ -409,7 +406,7 @@ export default function Home() {
         </div>
 
         <div className="code">
-          <TextArea
+          <Input.TextArea
             value={generatedCode}
             autoSize={{ minRows: 10, maxRows: 80 }}
             style={{
@@ -457,6 +454,16 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      <Layout.Footer style={{ textAlign: "center" }}>
+        <a
+          href="https://github.com/Salmandabbakuti"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          © {new Date().getFullYear()} Salman Dabbakuti. Powered by Nextjs
+        </a>
+      </Layout.Footer>
     </>
   );
 }

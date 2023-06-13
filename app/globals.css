@@ -76,10 +76,11 @@ body {
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  background-color: #fff;
 }
 
 a {
@@ -161,7 +162,7 @@ a {
   align-items: center;
   margin-top: 10px;
   padding: 5px;
-  background-color: #f5f5f5;
+  background-color: #282c34,
 }
 
 .log-box strong {
