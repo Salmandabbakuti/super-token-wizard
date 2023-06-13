@@ -140,6 +140,12 @@ export default function Home() {
     }
   };
 
+  const handleDisconnectWallet = async () => {
+    setAccount(null);
+    setProvider(null);
+    message.success("Wallet disconnected");
+  };
+
   const handleSwitchChain = async (selectedChainId) => {
     console.log("selectedChainId", selectedChainId);
     const selectedChain = chains[selectedChainId];
@@ -280,9 +286,11 @@ export default function Home() {
         </div>
         <div className="navbar-buttons">
           {account ? (
-            <span>{account.slice(0, 8) + "..." + account.slice(-5)}</span>
+            <Button type="secondary" onClick={handleDisconnectWallet}>
+              {account.slice(0, 8) + "..." + account.slice(-5)}
+            </Button>
           ) : (
-            <Button type="default" style={{}} onClick={handleConnectWallet}>
+            <Button type="secondary" onClick={handleConnectWallet}>
               Connect Wallet
             </Button>
           )}
@@ -292,6 +300,7 @@ export default function Home() {
             value={selectedChainId}
             onChange={(value) => setSelectedChainId(value)}
             onSelect={(value) => handleSwitchChain(value)}
+            style={{ width: 120 }}
           >
             {
               Object.keys(chains).map((chainId) => (
