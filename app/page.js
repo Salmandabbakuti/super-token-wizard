@@ -13,7 +13,8 @@ import {
   Typography,
   message,
   Select,
-  Space
+  Space,
+  Form
 } from "antd";
 import "antd/dist/antd.css";
 import Link from "next/link";
@@ -320,21 +321,27 @@ export default function Home() {
         <div className="options">
           <div className="section input">
             <h3>Token Options</h3>
+            <label htmlFor="tokenName">Name</label>
             <Input
+              id="tokenName"
               name="tokenName"
-              placeholder="Token Name"
+              placeholder="Name"
               value={wizardOptions?.tokenName}
               onChange={handleWizardOptionsChange}
             />
 
+            <label htmlFor="tokenSymbol">Symbol</label>
             <Input
+              id="tokenSymbol"
               name="tokenSymbol"
-              placeholder="Token Symbol"
+              placeholder="Symbol"
               value={wizardOptions?.tokenSymbol}
               onChange={handleWizardOptionsChange}
             />
 
+            <label htmlFor="premintQuantity">Premint Quantity</label>
             <Input
+              id="premintQuantity"
               name="premintQuantity"
               type="number"
               placeholder="Premint Quantity"
@@ -342,7 +349,9 @@ export default function Home() {
               onChange={handleWizardOptionsChange}
             />
 
+            <label htmlFor="premintReceiver">Premint Receiver</label>
             <Input
+              id="premintReceiver"
               name="premintReceiver"
               type="text"
               placeholder="Premint Receiver Address"
@@ -352,6 +361,7 @@ export default function Home() {
               onChange={handleWizardOptionsChange}
             />
           </div>
+
           <div className="section features">
             <h3>Features</h3>
             <Space direction="vertical">
@@ -382,6 +392,7 @@ export default function Home() {
           </div>
           <div className="section miscellaneous">
             <h3>Miscellaneous</h3>
+            <label htmlFor="licenseIdentifier">License Identifier</label>
             <Input
               name="licenseIdentifier"
               placeholder="License Identifier"
