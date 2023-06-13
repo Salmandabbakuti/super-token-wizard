@@ -101,6 +101,7 @@ export default function Home() {
         "$OWNABLE_INHERITANCE$",
         wizardOptions.isOwnable ? ", Ownable" : ""
       )
+      .replace("$PREMINT_RECEIVER$", wizardOptions?.premintReceiver || "msg.sender")
       .replace(
         "$PREMINT_QUANTITY$",
         `${wizardOptions?.premintQuantity} * 10 ** 18`
@@ -336,6 +337,16 @@ export default function Home() {
               type="number"
               placeholder="Premint Quantity"
               value={wizardOptions?.premintQuantity}
+              onChange={handleWizardOptionsChange}
+            />
+
+            <Input
+              name="premintReceiver"
+              type="text"
+              placeholder="Premint Receiver Address"
+              value={wizardOptions?.premintReceiver}
+              maxLength={42}
+              minLength={42}
               onChange={handleWizardOptionsChange}
             />
 

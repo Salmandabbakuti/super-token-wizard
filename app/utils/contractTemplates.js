@@ -8,7 +8,7 @@ contract MyToken is SuperTokenBase$OWNABLE_INHERITANCE$ {
 
 	function initialize(address factory, string memory name, string memory symbol) external {
 		_initialize(factory, name, symbol);
-		_mint(msg.sender, $PREMINT_QUANTITY$, "");
+		_mint($PREMINT_RECEIVER$, $PREMINT_QUANTITY$, "");
 	}
 
 	$MINT_FUNCTION$
