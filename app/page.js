@@ -16,8 +16,9 @@ import {
   Space,
   Layout
 } from "antd";
-import "antd/dist/antd.css";
 import Link from "next/link";
+import styles from "./page.module.css";
+import "antd/dist/antd.css";
 
 import {
   mainContract,
@@ -271,26 +272,34 @@ export default function Home() {
 
   return (
     <>
-      <div className="navbar">
-        <div className="logo">
+      <div className={styles.navbar}>
+        <div className={styles.logo}>
           <img
             src="/wizard_logo.svg"
             alt="Logo"
-            className="logo-image"
+            className={styles.logoImage}
             width={40}
             height={40}
           />
-          <Typography.Text strong className="logo-text">
+          <Typography.Text strong className={styles.logoText}>
             SuperToken Wizard
           </Typography.Text>
         </div>
-        <div className="navbar-buttons">
+        <div className={styles.navbarButtons}>
           {account ? (
-            <Button type="secondary" onClick={handleDisconnectWallet}>
-              {account.slice(0, 8) + "..." + account.slice(-5)}
+            <Button
+              type="secondary"
+              onClick={handleDisconnectWallet}
+              className={styles.actionsButton}
+            >
+              {account.slice(0, 8) + '...' + account.slice(-5)}
             </Button>
           ) : (
-            <Button type="secondary" onClick={handleConnectWallet}>
+            <Button
+              type="secondary"
+              onClick={handleConnectWallet}
+              className={styles.actionsButton}
+            >
               Connect Wallet
             </Button>
           )}
@@ -301,20 +310,19 @@ export default function Home() {
             onChange={(value) => setSelectedChainId(value)}
             onSelect={(value) => handleSwitchChain(value)}
             style={{ width: 120 }}
+            className={styles.actionsButton}
           >
-            {
-              Object.keys(chains).map((chainId) => (
-                <Select.Option key={chainId} value={chainId}>
-                  {chains[chainId]?.chainName?.split(" ")[0]}
-                </Select.Option>
-              ))
-            }
+            {Object.keys(chains).map(chainId => (
+              <Select.Option key={chainId} value={chainId}>
+                {chains[chainId]?.chainName?.split(' ')[0]}
+              </Select.Option>
+            ))}
           </Select>
         </div>
       </div>
-      <div className="container">
-        <div className="options">
-          <div className="section input">
+      <div className={styles.container}>
+        <div className={styles.options}>
+          <div className={styles.section}>
             <h3>Token Options</h3>
             <label htmlFor="tokenName">Name</label>
             <Input
@@ -324,7 +332,6 @@ export default function Home() {
               value={wizardOptions?.tokenName}
               onChange={handleWizardOptionsChange}
             />
-
             <label htmlFor="tokenSymbol">Symbol</label>
             <Input
               id="tokenSymbol"
@@ -333,7 +340,6 @@ export default function Home() {
               value={wizardOptions?.tokenSymbol}
               onChange={handleWizardOptionsChange}
             />
-
             <label htmlFor="premintQuantity">Premint Quantity</label>
             <Input
               id="premintQuantity"
@@ -343,7 +349,6 @@ export default function Home() {
               value={wizardOptions?.premintQuantity}
               onChange={handleWizardOptionsChange}
             />
-
             <label htmlFor="premintReceiver">Premint Receiver</label>
             <Input
               id="premintReceiver"
@@ -356,13 +361,12 @@ export default function Home() {
               onChange={handleWizardOptionsChange}
             />
           </div>
-
-          <div className="section features">
+          <div className={styles.section}>
             <h3>Features</h3>
             <Space direction="vertical">
               <Checkbox
                 checked={wizardOptions?.isMintable}
-                onChange={(e) =>
+                onChange={e =>
                   setWizardOptions({
                     ...wizardOptions,
                     isMintable: e.target.checked
@@ -371,10 +375,9 @@ export default function Home() {
               >
                 Mintable
               </Checkbox>
-
               <Checkbox
                 checked={wizardOptions?.isOwnable}
-                onChange={(e) =>
+                onChange={e =>
                   setWizardOptions({
                     ...wizardOptions,
                     isOwnable: e.target.checked
@@ -385,7 +388,7 @@ export default function Home() {
               </Checkbox>
             </Space>
           </div>
-          <div className="section miscellaneous">
+          <div className={styles.section}>
             <h3>Miscellaneous</h3>
             <label htmlFor="licenseIdentifier">License Identifier</label>
             <Input
@@ -396,24 +399,22 @@ export default function Home() {
             />
           </div>
         </div>
-
-        <div className="actions">
+        <div className={styles.actions}>
           <Button type="primary" onClick={handleGenerateCode}>
             Generate
           </Button>
         </div>
-
-        <div className="code">
+        <div className={styles.code}>
           <Input.TextArea
             value={generatedCode}
             autoSize={{ minRows: 10, maxRows: 80 }}
             style={{
-              fontFamily: "monospace",
-              fontSize: "14px",
-              backgroundColor: "#282c34",
-              color: "#fff",
-              width: "100%",
-              height: "100%"
+              fontFamily: 'monospace',
+              fontSize: '14px',
+              backgroundColor: '#282c34',
+              color: '#fff',
+              width: '100%',
+              height: '100%'
             }}
             readOnly
             spellCheck="false"
@@ -423,12 +424,10 @@ export default function Home() {
             rows={20}
             cols={80}
           />
-          <div className="code-buttons">
+          <div className={styles.codeButtons}>
             <Button onClick={handleCopyCode}>Copy Code</Button>
             <Link
-              href={`https://remix.ethereum.org/?#code=${btoa(
-                generatedCode
-              )}`}
+              href={`https://remix.ethereum.org/?#code=${btoa(generatedCode)}`}
               target="_blank"
             >
               <Button>Open in Remix</Button>
@@ -447,13 +446,12 @@ export default function Home() {
           </div>
         </div>
         {logMessage && (
-          <div className="log-box">
+          <div className={styles.logBox}>
             <p>{logMessage}</p>
           </div>
         )}
       </div>
-
-      <Layout.Footer style={{ textAlign: "center" }}>
+      <Layout.Footer style={{ textAlign: 'center' }}>
         <a
           href="https://github.com/Salmandabbakuti"
           target="_blank"
