@@ -101,7 +101,10 @@ export default function Home() {
         "$OWNABLE_INHERITANCE$",
         wizardOptions.isOwnable ? ", Ownable" : ""
       )
-      .replace("$PREMINT_RECEIVER$", wizardOptions?.premintReceiver || "msg.sender")
+      .replace(
+        "$PREMINT_RECEIVER$",
+        wizardOptions?.premintReceiver || "msg.sender"
+      )
       .replace(
         "$PREMINT_QUANTITY$",
         `${wizardOptions?.premintQuantity} * 10 ** 18`
@@ -118,7 +121,10 @@ export default function Home() {
   };
 
   const handleConnectWallet = async () => {
-    if (!window?.ethereum) return message.warning("Please install Metamask or any other web3 enabled browser");
+    if (!window?.ethereum)
+      return message.warning(
+        "Please install Metamask or any other web3 enabled browser"
+      );
     try {
       const [account1] = await window.ethereum.request({
         method: "eth_requestAccounts"
@@ -129,8 +135,13 @@ export default function Home() {
       console.log("current chainId:", chainId);
       // set selected chainid to the one user is connected to
       const selectedChain = chains[chainId];
-      setSelectedChainId(selectedChain ? chainId?.toString() : "Unsupported chain");
-      if (!selectedChain) return message.error("Unsupported chain. Please switch to supported chain");
+      setSelectedChainId(
+        selectedChain ? chainId?.toString() : "Unsupported chain"
+      );
+      if (!selectedChain)
+        return message.error(
+          "Unsupported chain. Please switch to supported chain"
+        );
       setAccount(account1);
       setProvider(provider);
       message.success("Wallet connected");
@@ -147,7 +158,10 @@ export default function Home() {
   };
 
   const handleSwitchChain = async (selectedChainId) => {
-    if (!window?.ethereum) return message.warning("Please install Metamask or any other web3 enabled browser");
+    if (!window?.ethereum)
+      return message.warning(
+        "Please install Metamask or any other web3 enabled browser"
+      );
     console.log("selectedChainId", selectedChainId);
     const selectedChain = chains[selectedChainId];
     if (!selectedChain) return message.error("Unsupported chain selected");
@@ -168,14 +182,18 @@ export default function Home() {
                 method: "wallet_addEthereumChain",
                 params: [selectedChain]
               })
-              .then(() => message.info(`Added ${selectedChain.chainName} to metamask`))
+              .then(() =>
+                message.info(`Added ${selectedChain.chainName} to metamask`)
+              )
               .catch((err) => {
-                message.error(`Failed to add ${selectedChain.chainName} to metamask`);
+                message.error(
+                  `Failed to add ${selectedChain.chainName} to metamask`
+                );
                 console.error(err);
               });
           } else {
             message.error(`Failed switching to ${selectedChain.chainName}`);
-          };
+          }
         });
       const provider = new Web3Provider(window.ethereum);
       const { chainId } = await provider.getNetwork();
@@ -224,7 +242,9 @@ export default function Home() {
     if (!provider) return message.error("Please connect your wallet first");
     if (!compiledOutput?.abi?.length)
       return message.error("Please compile the code first");
-    message.info("Since compiler is not ready, using precompiled artifacts to deploy for demo purpose");
+    message.info(
+      "Since compiler is not ready, using precompiled artifacts to deploy for demo purpose"
+    );
     try {
       const contractFactory = new ContractFactory(
         compiledOutput.abi,
@@ -233,7 +253,7 @@ export default function Home() {
       );
       const contract = await contractFactory.deploy();
       setLogMessage(
-        `Contract being Deployed.Transaction hash: ${contract.deployTransaction.hash}`
+        `Contract being deployed. Transaction hash: ${contract.deployTransaction.hash}`
       );
       await contract.deployed();
       setLogMessage(`Contract deployed at address: ${contract.address}`);
@@ -261,9 +281,11 @@ export default function Home() {
         wizardOptions?.tokenName,
         wizardOptions?.tokenSymbol
       );
-      setLogMessage(`Contract being Initialized.Transaction hash: ${tx.hash}`);
+      setLogMessage(`Contract being initialized. Transaction hash: ${tx.hash}`);
       await tx.wait();
       message.success("Contract initialized successfully");
+      setContract(null);
+      setLogMessage(`Contract initialized successfully`);
     } catch (err) {
       console.error("Error initializing contract", err);
       message.error("Something went wrong while initializing the contract");
@@ -425,24 +447,36 @@ export default function Home() {
             cols={80}
           />
           <div className={styles.codeButtons}>
-            <Button onClick={handleCopyCode}>Copy Code</Button>
+            <Button onClick={handleCopyCode} disabled={!generatedCode}>
+              Copy Code
+            </Button>
             <Link
               href={`https://remix.ethereum.org/?#code=${btoa(generatedCode)}`}
               target="_blank"
             >
-              <Button>Open in Remix</Button>
+              <Button disabled={!generatedCode}>Open in Remix</Button>
             </Link>
-            <Button type="primary" onClick={handleCompile}>
+            <Button
+              type="primary"
+              onClick={handleCompile}
+              disabled={!generatedCode}
+            >
               Compile
             </Button>
-            <Button type="primary" onClick={handleDeploy}>
+            <Button
+              type="primary"
+              onClick={handleDeploy}
+              disabled={!compiledOutput?.bytecode}
+            >
               Deploy
             </Button>
-            {contract && (
-              <Button type="primary" onClick={handleInitialize}>
-                Initialize
-              </Button>
-            )}
+            <Button
+              type="primary"
+              disabled={!contract}
+              onClick={handleInitialize}
+            >
+              Initialize
+            </Button>
           </div>
         </div>
         {logMessage && (
