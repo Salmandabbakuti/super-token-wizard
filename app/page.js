@@ -88,6 +88,13 @@ export default function Home() {
   const [contract, setContract] = useState(null);
   const [logMessage, setLogMessage] = useState("");
   const [selectedChainId, setSelectedChainId] = useState("80001");
+  const [loading, setLoading] = useState({
+    connect: false,
+    switch: false,
+    compile: false,
+    deploy: false,
+    initialize: false
+  });
 
   const handleWizardOptionsChange = (e) => {
     setWizardOptions({ ...wizardOptions, [e.target.name]: e.target.value });
@@ -125,6 +132,7 @@ export default function Home() {
       return message.warning(
         "Please install Metamask or any other web3 enabled browser"
       );
+    setLoading({ connect: true });
     try {
       const [account1] = await window.ethereum.request({
         method: "eth_requestAccounts"
@@ -145,7 +153,9 @@ export default function Home() {
       setAccount(account1);
       setProvider(provider);
       message.success("Wallet connected");
+      setLoading({ connect: false });
     } catch (err) {
+      setLoading({ connect: false });
       console.log("err connecting wallet", err);
       message.error("Failed to connect wallet!");
     }
@@ -165,6 +175,7 @@ export default function Home() {
     console.log("selectedChainId", selectedChainId);
     const selectedChain = chains[selectedChainId];
     if (!selectedChain) return message.error("Unsupported chain selected");
+    setLoading({ switch: true });
     try {
       await window.ethereum
         .request({
@@ -199,7 +210,9 @@ export default function Home() {
       const { chainId } = await provider.getNetwork();
       console.log("switched chainId:", chainId);
       setProvider(provider);
+      setLoading({ switch: false });
     } catch (err) {
+      setLoading({ switch: false });
       console.log("err switching chain:", err);
       message.error("Failed to switch chain!");
     }
@@ -242,6 +255,7 @@ export default function Home() {
     if (!provider) return message.error("Please connect your wallet first");
     if (!compiledOutput?.abi?.length)
       return message.error("Please compile the code first");
+    setLoading({ deploy: true });
     message.info(
       "Since compiler is not ready, using precompiled artifacts to deploy for demo purpose"
     );
@@ -259,7 +273,9 @@ export default function Home() {
       setLogMessage(`Contract deployed at address: ${contract.address}`);
       setContract(contract);
       message.success("Contract deployed successfully");
+      setLoading({ deploy: false });
     } catch (err) {
+      setLoading({ deploy: false });
       console.error("Error deploying contract", err);
       message.error("Something went wrong while deploying the contract");
     }
@@ -273,6 +289,7 @@ export default function Home() {
       /^\s*$/.test(wizardOptions?.tokenSymbol)
     )
       return message.error("Please set token name and symbol");
+    setLoading({ initialize: true });
     try {
       const { chainId } = await provider.getNetwork();
       const factoryAddress = superTokenFactoryAddresses[chainId];
@@ -286,7 +303,9 @@ export default function Home() {
       message.success("Contract initialized successfully");
       setContract(null);
       setLogMessage(`Contract initialized successfully`);
+      setLoading({ initialize: false });
     } catch (err) {
+      setLoading({ initialize: false });
       console.error("Error initializing contract", err);
       message.error("Something went wrong while initializing the contract");
     }
@@ -321,6 +340,7 @@ export default function Home() {
               type="secondary"
               onClick={handleConnectWallet}
               className={styles.actionsButton}
+              loading={loading.connect}
             >
               Connect Wallet
             </Button>
@@ -333,6 +353,7 @@ export default function Home() {
             onSelect={(value) => handleSwitchChain(value)}
             style={{ width: 120 }}
             className={styles.actionsButton}
+            loading={loading.switch}
           >
             {Object.keys(chains).map((chainId) => (
               <Select.Option key={chainId} value={chainId}>
@@ -459,21 +480,24 @@ export default function Home() {
             <Button
               type="primary"
               onClick={handleCompile}
-              disabled={!generatedCode}
+              disabled={!generatedCode || loading.compile}
+              loading={loading.compile}
             >
               Compile
             </Button>
             <Button
               type="primary"
               onClick={handleDeploy}
-              disabled={!compiledOutput?.bytecode}
+              disabled={!compiledOutput?.bytecode || loading.deploy}
+              loading={loading.deploy}
             >
               Deploy
             </Button>
             <Button
               type="primary"
-              disabled={!contract}
+              disabled={!contract || loading.initialize}
               onClick={handleInitialize}
+              loading={loading.initialize}
             >
               Initialize
             </Button>
