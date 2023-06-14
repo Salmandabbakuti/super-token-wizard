@@ -118,20 +118,25 @@ export default function Home() {
 
   const handleConnectWallet = async () => {
     if (window?.ethereum) {
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts"
-      });
-      console.log("Using account: ", accounts[0]);
-      const provider = new Web3Provider(window.ethereum);
-      const { chainId } = await provider.getNetwork();
-      console.log("current chainId:", chainId);
-      // set selected chainid to the one user is connected to
-      const selectedChain = chains[chainId];
-      setSelectedChainId(selectedChain ? chainId?.toString() : "Unsupported chain");
-      if (!selectedChain) return message.error("Unsupported chain. Please switch to supported chain");
-      setAccount(accounts[0]);
-      setProvider(provider);
-      message.success("Wallet connected");
+      try {
+        const [account1] = await window.ethereum.request({
+          method: "eth_requestAccounts"
+        });
+        console.log("Using account: ", account1);
+        const provider = new Web3Provider(window.ethereum);
+        const { chainId } = await provider.getNetwork();
+        console.log("current chainId:", chainId);
+        // set selected chainid to the one user is connected to
+        const selectedChain = chains[chainId];
+        setSelectedChainId(selectedChain ? chainId?.toString() : "Unsupported chain");
+        if (!selectedChain) return message.error("Unsupported chain. Please switch to supported chain");
+        setAccount(account1);
+        setProvider(provider);
+        message.success("Wallet connected");
+      } catch (err) {
+        console.log("err connecting wallet", err);
+        message.error("Failed to connect wallet!");
+      }
     } else {
       console.warn("Please use web3 enabled browser");
       message.warning(
@@ -151,35 +156,40 @@ export default function Home() {
     const selectedChain = chains[selectedChainId];
     if (!selectedChain) return message.error("Unsupported chain selected");
     if (window?.ethereum) {
-      window.ethereum
-        .request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: selectedChain.chainId }]
-        })
-        .then(() => message.info(`Switched to ${selectedChain.chainName}`))
-        .catch((err) => {
-          // This error code indicates that the chain has not been added to MetaMask.
-          console.log("err on switch", err);
-          if (err.code === 4902) {
-            message.info(`Adding ${selectedChain.chainName} to metamask`);
-            window.ethereum
-              .request({
-                method: "wallet_addEthereumChain",
-                params: [selectedChain]
-              })
-              .then(() =>
-                message.info(`Switched to ${selectedChain.chainName}`)
-              )
-              .catch((err) => {
-                message.error(`Error adding ${selectedChain.chainName}`);
-                console.error(err);
-              });
-          }
-        });
-      const provider = new Web3Provider(window.ethereum);
-      const { chainId } = await provider.getNetwork();
-      console.log("switched chainId:", chainId);
-      setProvider(provider);
+      try {
+        await window.ethereum
+          .request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: selectedChain.chainId }]
+          })
+          .then(() => message.info(`Switched to ${selectedChain.chainName}`))
+          .catch(async (err) => {
+            console.log("err on switch", err);
+            // This error code indicates that the chain has not been added to MetaMask.
+            if (err.code === 4902) {
+              message.info(`Adding ${selectedChain.chainName} to metamask`);
+              await window.ethereum
+                .request({
+                  method: "wallet_addEthereumChain",
+                  params: [selectedChain]
+                })
+                .then(() => message.info(`Added ${selectedChain.chainName} to metamask`))
+                .catch((err) => {
+                  message.error(`Failed to add ${selectedChain.chainName} to metamask`);
+                  console.error(err);
+                });
+            } else {
+              message.error(`Failed switching to ${selectedChain.chainName}`);
+            };
+          });
+        const provider = new Web3Provider(window.ethereum);
+        const { chainId } = await provider.getNetwork();
+        console.log("switched chainId:", chainId);
+        setProvider(provider);
+      } catch (err) {
+        console.log("err switching chain:", err);
+        message.error("Failed to switch chain!");
+      }
     } else {
       console.warn("Please use web3 enabled browser");
       message.warning(
@@ -254,9 +264,9 @@ export default function Home() {
       /^\s*$/.test(wizardOptions?.tokenSymbol)
     )
       return message.error("Please set token name and symbol");
-    const { chainId } = await provider.getNetwork();
-    const factoryAddress = superTokenFactoryAddresses[chainId];
     try {
+      const { chainId } = await provider.getNetwork();
+      const factoryAddress = superTokenFactoryAddresses[chainId];
       const tx = await contract.initialize(
         factoryAddress,
         wizardOptions?.tokenName,
