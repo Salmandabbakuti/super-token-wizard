@@ -29,14 +29,14 @@ import {
 import compiledOutput from "./utils/MyToken.json";
 
 const superTokenFactoryAddresses = {
-  "80001": "0xb798553db6eb3d3c56912378409370145e97324b",
-  "137": "0x2C90719f25B10Fc5646c82DA3240C76Fa5BcCF34",
-  "5": "0x94f26B4c8AD12B18c12f38E878618f7664bdcCE2",
-  "1": "0x0422689cc4087b6B7280e0a7e7F655200ec86Ae1"
+  80001: "0xb798553db6eb3d3c56912378409370145e97324b",
+  137: "0x2C90719f25B10Fc5646c82DA3240C76Fa5BcCF34",
+  5: "0x94f26B4c8AD12B18c12f38E878618f7664bdcCE2",
+  1: "0x0422689cc4087b6B7280e0a7e7F655200ec86Ae1"
 };
 
 const chains = {
-  "80001": {
+  80001: {
     chainId: "0x13881",
     chainName: "Mumbai Testnet",
     nativeCurrency: {
@@ -50,7 +50,7 @@ const chains = {
     ],
     blockExplorerUrls: ["https://mumbai.polygonscan.com"]
   },
-  "137": {
+  137: {
     chainId: "0x89",
     chainName: "Polygon Mainnet",
     nativeCurrency: {
@@ -64,14 +64,14 @@ const chains = {
     ],
     blockExplorerUrls: ["https://polygonscan.com"]
   },
-  "5": {
+  5: {
     chainId: "0x5",
     chainName: "Goerli"
   },
-  "1": {
+  1: {
     chainId: "0x1",
     chainName: "Ethereum Mainnet"
-  },
+  }
 };
 
 export default function Home() {
@@ -292,7 +292,7 @@ export default function Home() {
               onClick={handleDisconnectWallet}
               className={styles.actionsButton}
             >
-              {account.slice(0, 8) + '...' + account.slice(-5)}
+              {account.slice(0, 8) + "..." + account.slice(-5)}
             </Button>
           ) : (
             <Button
@@ -312,9 +312,9 @@ export default function Home() {
             style={{ width: 120 }}
             className={styles.actionsButton}
           >
-            {Object.keys(chains).map(chainId => (
+            {Object.keys(chains).map((chainId) => (
               <Select.Option key={chainId} value={chainId}>
-                {chains[chainId]?.chainName?.split(' ')[0]}
+                {chains[chainId]?.chainName?.split(" ")[0]}
               </Select.Option>
             ))}
           </Select>
@@ -366,7 +366,7 @@ export default function Home() {
             <Space direction="vertical">
               <Checkbox
                 checked={wizardOptions?.isMintable}
-                onChange={e =>
+                onChange={(e) =>
                   setWizardOptions({
                     ...wizardOptions,
                     isMintable: e.target.checked
@@ -377,7 +377,7 @@ export default function Home() {
               </Checkbox>
               <Checkbox
                 checked={wizardOptions?.isOwnable}
-                onChange={e =>
+                onChange={(e) =>
                   setWizardOptions({
                     ...wizardOptions,
                     isOwnable: e.target.checked
@@ -409,12 +409,12 @@ export default function Home() {
             value={generatedCode}
             autoSize={{ minRows: 10, maxRows: 80 }}
             style={{
-              fontFamily: 'monospace',
-              fontSize: '14px',
-              backgroundColor: '#282c34',
-              color: '#fff',
-              width: '100%',
-              height: '100%'
+              fontFamily: "monospace",
+              fontSize: "14px",
+              backgroundColor: "#282c34",
+              color: "#fff",
+              width: "100%",
+              height: "100%"
             }}
             readOnly
             spellCheck="false"
@@ -451,7 +451,7 @@ export default function Home() {
           </div>
         )}
       </div>
-      <Layout.Footer style={{ textAlign: 'center' }}>
+      <Layout.Footer style={{ textAlign: "center" }}>
         <a
           href="https://github.com/Salmandabbakuti"
           target="_blank"
