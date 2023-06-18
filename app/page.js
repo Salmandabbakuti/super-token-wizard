@@ -23,7 +23,8 @@ import "antd/dist/antd.css";
 import {
   mainContract,
   ownableImport,
-  mintFunction
+  mintFunction,
+  burnFunction
 } from "./utils/contractTemplates";
 
 import compiledOutput from "./utils/MyToken.json";
@@ -117,6 +118,7 @@ export default function Home() {
         `${wizardOptions?.premintQuantity} * 10 ** 18`
       )
       .replace("$MINT_FUNCTION$", wizardOptions.isMintable ? mintFunction : "")
+      .replace("$BURN_FUNCTION$", wizardOptions.isBurnable ? burnFunction : "")
       .replace("$ONLY_OWNER$", wizardOptions.isOwnable ? "onlyOwner" : "");
     setGeneratedCode(contractCode);
   };
@@ -417,6 +419,17 @@ export default function Home() {
                 }
               >
                 Mintable
+              </Checkbox>
+              <Checkbox
+                checked={wizardOptions?.isBurnable}
+                onChange={(e) =>
+                  setWizardOptions({
+                    ...wizardOptions,
+                    isBurnable: e.target.checked
+                  })
+                }
+              >
+                Burnable
               </Checkbox>
               <Checkbox
                 checked={wizardOptions?.isOwnable}

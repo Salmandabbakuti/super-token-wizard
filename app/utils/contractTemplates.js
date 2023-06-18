@@ -12,6 +12,8 @@ contract MyToken is SuperTokenBase$OWNABLE_INHERITANCE$ {
 	}
 
 	$MINT_FUNCTION$
+
+	$BURN_FUNCTION$
 }
 `;
 
@@ -19,4 +21,8 @@ export const ownableImport = "import {Ownable} from '@openzeppelin/contracts/acc
 
 export const mintFunction = `function mint(address receiver, uint256 amount, bytes memory userData) external $ONLY_OWNER$ {
 		_mint(receiver, amount, userData);
+	}`;
+
+export const burnFunction = `function burn(uint256 amount, bytes memory userData) external {
+		_burn(msg.sender, amount, userData);
 	}`;
