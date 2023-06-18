@@ -144,7 +144,7 @@ export default function Home() {
       // set selected chainid to the one user is connected to
       const selectedChain = chains[chainId];
       setSelectedChainId(
-        selectedChain ? chainId?.toString() : "Unsupported chain"
+        selectedChain ? chainId?.toString() : "⚠ Unsupported chain"
       );
       if (!selectedChain)
         return message.error(
