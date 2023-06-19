@@ -22,11 +22,12 @@ import "antd/dist/antd.css";
 
 import {
   mainContract,
+  supertokenBaseImport,
+  supertokenBaseImportLocalPath,
   ownableImport,
-  mintFunction
+  mintFunction,
+  burnFunction
 } from "./utils/contractTemplates";
-
-import compiledOutput from "./utils/MyToken.json";
 
 const superTokenFactoryAddresses = {
   80001: "0xb798553db6eb3d3c56912378409370145e97324b",
@@ -82,7 +83,7 @@ export default function Home() {
     tokenSymbol: ""
   });
   const [generatedCode, setGeneratedCode] = useState("");
-  // const [compiledOutput, setCompiledOutput] = useState(null);
+  const [compiledOutput, setCompiledOutput] = useState(null);
   const [provider, setProvider] = useState(null);
   const [account, setAccount] = useState(null);
   const [contract, setContract] = useState(null);
@@ -117,6 +118,7 @@ export default function Home() {
         `${wizardOptions?.premintQuantity} * 10 ** 18`
       )
       .replace("$MINT_FUNCTION$", wizardOptions.isMintable ? mintFunction : "")
+      .replace("$BURN_FUNCTION$", wizardOptions.isBurnable ? burnFunction : "")
       .replace("$ONLY_OWNER$", wizardOptions.isOwnable ? "onlyOwner" : "");
     setGeneratedCode(contractCode);
   };
@@ -144,7 +146,7 @@ export default function Home() {
       // set selected chainid to the one user is connected to
       const selectedChain = chains[chainId];
       setSelectedChainId(
-        selectedChain ? chainId?.toString() : "Unsupported chain"
+        selectedChain ? chainId?.toString() : "⚠ Unsupported chain"
       );
       if (!selectedChain)
         return message.error(
@@ -220,45 +222,52 @@ export default function Home() {
 
   const handleCompile = async () => {
     if (!generatedCode) return message.error("Please generate the code first");
-    return message.info("Coming soon...");
-    // const releases = await getCompilerVersions();
-    // console.log("releases", releases);
-    // try {
-    //   const compiled = await solidityCompiler({
-    //     version: "https://binaries.soliditylang.org/emscripten-wasm32/solc-emscripten-wasm32-v0.8.0+commit.c7dfd78e.js",
-    //     contractBody: generatedCode,
-    //     options: {
-    //       optimizer: {
-    //         enabled: false,
-    //         runs: 200
-    //       }
-    //     },
-    //   });
-    //   console.log("compiled", compiled);
-    //   if (compiled?.errors) {
-    //     console.error("Error compiling code", compiled.errors);
-    //     const errors = compiled?.errors?.map((err) => err.formattedMessage);
-    //     return message.error(errors.join(", "));
-    //   }
-    //   setCompiledOutput({
-    //     abi: compiled?.contracts?.Compiled_Contracts["MyToken"]?.abi,
-    //     bytecode: compiled?.contracts?.Compiled_Contracts["MyToken"]?.evm?.bytecode?.object
-    //   });
-    //   message.success("Code compiled successfully");
-    // } catch (err) {
-    //   console.error("Error compiling code", err);
-    //   message.error("Something went wrong while compiling the code");
-    // }
+    try {
+      setLoading({ compile: true });
+      // using local import path for compilation
+      const codeForCompilation = generatedCode.replace(
+        supertokenBaseImport,
+        supertokenBaseImportLocalPath
+      );
+      const response = await fetch("/api/compile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ code: codeForCompilation })
+      });
+
+      if (!response.ok) {
+        setLoading({ compile: false });
+        return message.error("Something went wrong while compiling the code");
+      }
+      const data = await response.json();
+      if (data.code && data.message) {
+        setLoading({ compile: false });
+        return message.error("Something went wrong while compiling the code");
+      }
+      setCompiledOutput(data);
+      setLoading({ compile: false });
+      message.success("Code compiled successfully");
+    } catch (err) {
+      setLoading({ compile: false });
+      console.error("Error compiling code", err);
+      message.error("Something went wrong while compiling the code");
+    }
+  };
+
+  const handleCopyArtifacts = () => {
+    if (!compiledOutput?.abi?.length || !compiledOutput?.bytecode)
+      return message.error("Please compile the code first");
+    navigator.clipboard.writeText(JSON.stringify(compiledOutput));
+    message.success("Contract artifacts copied to clipboard");
   };
 
   const handleDeploy = async () => {
     if (!provider) return message.error("Please connect your wallet first");
-    if (!compiledOutput?.abi?.length)
+    if (!compiledOutput?.abi?.length || !compiledOutput?.bytecode)
       return message.error("Please compile the code first");
     setLoading({ deploy: true });
-    message.info(
-      "Since compiler is not ready, using precompiled artifacts to deploy for demo purpose"
-    );
     try {
       const contractFactory = new ContractFactory(
         compiledOutput.abi,
@@ -419,6 +428,17 @@ export default function Home() {
                 Mintable
               </Checkbox>
               <Checkbox
+                checked={wizardOptions?.isBurnable}
+                onChange={(e) =>
+                  setWizardOptions({
+                    ...wizardOptions,
+                    isBurnable: e.target.checked
+                  })
+                }
+              >
+                Burnable
+              </Checkbox>
+              <Checkbox
                 checked={wizardOptions?.isOwnable}
                 onChange={(e) =>
                   setWizardOptions({
@@ -484,6 +504,14 @@ export default function Home() {
               loading={loading.compile}
             >
               Compile
+            </Button>
+
+            <Button
+              type="primary"
+              onClick={handleCopyArtifacts}
+              disabled={!compiledOutput?.bytecode}
+            >
+              Copy Artifacts
             </Button>
             <Button
               type="primary"
