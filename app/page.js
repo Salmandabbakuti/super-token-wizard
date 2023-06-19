@@ -225,21 +225,27 @@ export default function Home() {
     try {
       setLoading({ compile: true });
       // using local import path for compilation
-      const codeForCompilation = generatedCode.replace(supertokenBaseImport, supertokenBaseImportLocalPath);
-      console.log(codeForCompilation);
-      const response = await fetch('/api/compile', {
-        method: 'POST',
+      const codeForCompilation = generatedCode.replace(
+        supertokenBaseImport,
+        supertokenBaseImportLocalPath
+      );
+      const response = await fetch("/api/compile", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ code: codeForCompilation })
       });
 
       if (!response.ok) {
-        throw new Error('Compilation failed');
+        setLoading({ compile: false });
+        return message.error("Something went wrong while compiling the code");
       }
-
       const data = await response.json();
+      if (data.code && data.message) {
+        setLoading({ compile: false });
+        return message.error("Something went wrong while compiling the code");
+      }
       setCompiledOutput(data);
       setLoading({ compile: false });
       message.success("Code compiled successfully");
@@ -250,9 +256,16 @@ export default function Home() {
     }
   };
 
+  const handleCopyArtifacts = () => {
+    if (!compiledOutput?.abi?.length || !compiledOutput?.bytecode)
+      return message.error("Please compile the code first");
+    navigator.clipboard.writeText(JSON.stringify(compiledOutput));
+    message.success("Contract artifacts copied to clipboard");
+  };
+
   const handleDeploy = async () => {
     if (!provider) return message.error("Please connect your wallet first");
-    if (!compiledOutput?.abi?.length)
+    if (!compiledOutput?.abi?.length || !compiledOutput?.bytecode)
       return message.error("Please compile the code first");
     setLoading({ deploy: true });
     try {
@@ -491,6 +504,14 @@ export default function Home() {
               loading={loading.compile}
             >
               Compile
+            </Button>
+
+            <Button
+              type="primary"
+              onClick={handleCopyArtifacts}
+              disabled={!compiledOutput?.bytecode}
+            >
+              Copy Artifacts
             </Button>
             <Button
               type="primary"

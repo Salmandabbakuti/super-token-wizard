@@ -6,31 +6,21 @@ import { promisify } from 'util';
 const execPromise = promisify(exec);
 
 export async function GET(req) {
-  try {
-    await execPromise("npx hardhat compile");
-
-    // Read the contract artifacts
-    const artifactPath = 'artifacts/contracts/MyToken.sol/MyToken.json';
-    const artifactData = fs.readFileSync(artifactPath, 'utf8');
-    const { abi, bytecode } = JSON.parse(artifactData);
-
-    // Return the ABI and bytecode
-    return NextResponse.json({ abi, bytecode });
-  } catch (error) {
-    console.log(`error: ${error.message}`);
-    return NextResponse.error({ error: 'Compilation failed' });
-  }
+  return NextResponse.json({ message: 'Hello, Please POST to compile contract!' });
 }
 
 export async function POST(req) {
-  console.log(req.body);
   try {
     const body = await req.json();
-    console.log(body.code);
     const id = new Date().toISOString().replace(/[^0-9]/gi, "");
     const fileName = `MyToken_${id}.sol`;
     await fs.promises.writeFile(`contracts/${fileName}`, body.code);
-    await execPromise("npx hardhat compile");
+    const commandRes = await execPromise("npx hardhat compile");
+    console.log("commandRes", commandRes);
+    // if (commandRes.stderr) {
+    //   console.log(`stderr: ${commandRes.stderr}`);
+    //   return NextResponse.json({ error: 'Compilation failed' });
+    // }
 
     // delete the contract file
     await fs.promises.unlink(`contracts/${fileName}`);
@@ -46,7 +36,7 @@ export async function POST(req) {
     // Return the ABI and bytecode
     return NextResponse.json({ abi, bytecode });
   } catch (error) {
-    console.log(`error: ${error.message}`);
-    return NextResponse.json({ code: "500", message: error.message });
+    console.log(`api error: ${error.message}`);
+    return NextResponse.json({ code: "500", message: 'Compilation failed' });
   }
 }
