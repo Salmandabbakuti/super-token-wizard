@@ -17,7 +17,7 @@ contract MyToken is SuperTokenBase$OWNABLE_INHERITANCE$ {
 }
 `;
 
-export const ownableImport = "import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';";
+export const ownableImport = `import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";`;
 
 export const mintFunction = `function mint(address receiver, uint256 amount, bytes memory userData) external $ONLY_OWNER$ {
 		_mint(receiver, amount, userData);
@@ -26,3 +26,7 @@ export const mintFunction = `function mint(address receiver, uint256 amount, byt
 export const burnFunction = `function burn(uint256 amount, bytes memory userData) external {
 		_burn(msg.sender, amount, userData);
 	}`;
+
+export const supertokenBaseImport = `import {SuperTokenBase} from "github.com/superfluid-finance/custom-supertokens/contracts/base/SuperTokenBase.sol";`;
+
+export const supertokenBaseImportLocalPath = `import {SuperTokenBase} from "./base/SuperTokenBase.sol";`;

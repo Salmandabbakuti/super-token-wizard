@@ -23,19 +23,25 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
+  console.log(req.body);
   try {
+    const body = await req.json();
+    console.log(body.code);
     const id = new Date().toISOString().replace(/[^0-9]/gi, "");
     const fileName = `MyToken_${id}.sol`;
-    await fs.promises.writeFile(`contracts/${fileName}`, req.body.code);
+    await fs.promises.writeFile(`contracts/${fileName}`, body.code);
     await execPromise("npx hardhat compile");
+
+    // delete the contract file
+    await fs.promises.unlink(`contracts/${fileName}`);
 
     // Read the contract artifacts
     const artifactPath = `artifacts/contracts/${fileName}/MyToken.json`;
     const artifactData = fs.readFileSync(artifactPath, 'utf8');
     const { abi, bytecode } = JSON.parse(artifactData);
 
-    // delete the file
-    await fs.promises.unlink(`contracts/${fileName}`);
+    // delete the artifact
+    await fs.promises.rm(`artifacts/contracts/${fileName}`, { recursive: true, force: true });
 
     // Return the ABI and bytecode
     return NextResponse.json({ abi, bytecode });

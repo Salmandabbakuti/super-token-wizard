@@ -22,12 +22,12 @@ import "antd/dist/antd.css";
 
 import {
   mainContract,
+  supertokenBaseImport,
+  supertokenBaseImportLocalPath,
   ownableImport,
   mintFunction,
   burnFunction
 } from "./utils/contractTemplates";
-
-import compiledOutput from "./utils/MyToken.json";
 
 const superTokenFactoryAddresses = {
   80001: "0xb798553db6eb3d3c56912378409370145e97324b",
@@ -83,7 +83,7 @@ export default function Home() {
     tokenSymbol: ""
   });
   const [generatedCode, setGeneratedCode] = useState("");
-  // const [compiledOutput, setCompiledOutput] = useState(null);
+  const [compiledOutput, setCompiledOutput] = useState(null);
   const [provider, setProvider] = useState(null);
   const [account, setAccount] = useState(null);
   const [contract, setContract] = useState(null);
@@ -222,35 +222,32 @@ export default function Home() {
 
   const handleCompile = async () => {
     if (!generatedCode) return message.error("Please generate the code first");
-    return message.info("Coming soon...");
-    // const releases = await getCompilerVersions();
-    // console.log("releases", releases);
-    // try {
-    //   const compiled = await solidityCompiler({
-    //     version: "https://binaries.soliditylang.org/emscripten-wasm32/solc-emscripten-wasm32-v0.8.0+commit.c7dfd78e.js",
-    //     contractBody: generatedCode,
-    //     options: {
-    //       optimizer: {
-    //         enabled: false,
-    //         runs: 200
-    //       }
-    //     },
-    //   });
-    //   console.log("compiled", compiled);
-    //   if (compiled?.errors) {
-    //     console.error("Error compiling code", compiled.errors);
-    //     const errors = compiled?.errors?.map((err) => err.formattedMessage);
-    //     return message.error(errors.join(", "));
-    //   }
-    //   setCompiledOutput({
-    //     abi: compiled?.contracts?.Compiled_Contracts["MyToken"]?.abi,
-    //     bytecode: compiled?.contracts?.Compiled_Contracts["MyToken"]?.evm?.bytecode?.object
-    //   });
-    //   message.success("Code compiled successfully");
-    // } catch (err) {
-    //   console.error("Error compiling code", err);
-    //   message.error("Something went wrong while compiling the code");
-    // }
+    try {
+      setLoading({ compile: true });
+      // using local import path for compilation
+      const codeForCompilation = generatedCode.replace(supertokenBaseImport, supertokenBaseImportLocalPath);
+      console.log(codeForCompilation);
+      const response = await fetch('/api/compile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ code: codeForCompilation })
+      });
+
+      if (!response.ok) {
+        throw new Error('Compilation failed');
+      }
+
+      const data = await response.json();
+      setCompiledOutput(data);
+      setLoading({ compile: false });
+      message.success("Code compiled successfully");
+    } catch (err) {
+      setLoading({ compile: false });
+      console.error("Error compiling code", err);
+      message.error("Something went wrong while compiling the code");
+    }
   };
 
   const handleDeploy = async () => {
@@ -258,9 +255,6 @@ export default function Home() {
     if (!compiledOutput?.abi?.length)
       return message.error("Please compile the code first");
     setLoading({ deploy: true });
-    message.info(
-      "Since compiler is not ready, using precompiled artifacts to deploy for demo purpose"
-    );
     try {
       const contractFactory = new ContractFactory(
         compiledOutput.abi,
