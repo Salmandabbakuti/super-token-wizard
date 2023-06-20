@@ -25,51 +25,11 @@ import {
   burnFunction
 } from "./utils/contractTemplates";
 
-const superTokenFactoryAddresses = {
-  80001: "0xb798553db6eb3d3c56912378409370145e97324b",
-  137: "0x2C90719f25B10Fc5646c82DA3240C76Fa5BcCF34",
-  5: "0x94f26B4c8AD12B18c12f38E878618f7664bdcCE2",
-  1: "0x0422689cc4087b6B7280e0a7e7F655200ec86Ae1"
-};
-
-const chains = {
-  80001: {
-    chainId: "0x13881",
-    chainName: "Mumbai Testnet",
-    nativeCurrency: {
-      name: "MATIC",
-      symbol: "MATIC",
-      decimals: 18
-    },
-    rpcUrls: [
-      "https://matic-mumbai.chainstacklabs.com",
-      "https://rpc-mumbai.maticvigil.com"
-    ],
-    blockExplorerUrls: ["https://mumbai.polygonscan.com"]
-  },
-  137: {
-    chainId: "0x89",
-    chainName: "Polygon Mainnet",
-    nativeCurrency: {
-      name: "MATIC",
-      symbol: "MATIC",
-      decimals: 18
-    },
-    rpcUrls: [
-      "https://rpc-mainnet.maticvigil.com",
-      "https://matic-mainnet.chainstacklabs.com"
-    ],
-    blockExplorerUrls: ["https://polygonscan.com"]
-  },
-  5: {
-    chainId: "0x5",
-    chainName: "Goerli"
-  },
-  1: {
-    chainId: "0x1",
-    chainName: "Ethereum Mainnet"
-  }
-};
+import {
+  superTokenFactoryAddresses,
+  chains,
+  isAddressValid
+} from "./utils";
 
 const compilerUrl = process.env.NEXT_PUBLIC_COMPILER_URL || "api/compile";
 
@@ -100,24 +60,30 @@ export default function Home() {
   };
 
   const handleGenerateCode = () => {
+    const {
+      licenseIdentifier,
+      isOwnable,
+      premintReceiver,
+      premintQuantity,
+      isMintable,
+      isBurnable,
+    } = wizardOptions;
+
+    if (!premintQuantity) return message.error("Valid premint quantity is required");
+    if (premintReceiver && !isAddressValid(premintReceiver)) return message.error("Invalid premint receiver address");
+
+    const premintReceiverValue = premintReceiver || "msg.sender";
+    const premintQuantityValue = `${premintQuantity} * 10 ** 18`;
     const contractCode = mainContract
-      .replace("$LICENSE_IDENTIFIER$", wizardOptions.licenseIdentifier)
-      .replace("$OWNABLE_IMPORT$", wizardOptions.isOwnable ? ownableImport : "")
-      .replace(
-        "$OWNABLE_INHERITANCE$",
-        wizardOptions.isOwnable ? ", Ownable" : ""
-      )
-      .replace(
-        "$PREMINT_RECEIVER$",
-        wizardOptions?.premintReceiver || "msg.sender"
-      )
-      .replace(
-        "$PREMINT_QUANTITY$",
-        `${wizardOptions?.premintQuantity} * 10 ** 18`
-      )
-      .replace("$MINT_FUNCTION$", wizardOptions.isMintable ? mintFunction : "")
-      .replace("$BURN_FUNCTION$", wizardOptions.isBurnable ? burnFunction : "")
-      .replace("$ONLY_OWNER$", wizardOptions.isOwnable ? "onlyOwner" : "");
+      .replace("$LICENSE_IDENTIFIER$", licenseIdentifier)
+      .replace("$OWNABLE_IMPORT$", isOwnable ? ownableImport : "")
+      .replace("$OWNABLE_INHERITANCE$", isOwnable ? ", Ownable" : "")
+      .replace("$PREMINT_RECEIVER$", premintReceiverValue)
+      .replace("$PREMINT_QUANTITY$", premintQuantityValue)
+      .replace("$MINT_FUNCTION$", isMintable ? mintFunction : "")
+      .replace("$BURN_FUNCTION$", isBurnable ? burnFunction : "")
+      .replace("$ONLY_OWNER$", isOwnable ? "onlyOwner" : "");
+
     setGeneratedCode(contractCode);
   };
 
