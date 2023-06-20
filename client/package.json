@@ -1,7 +1,10 @@
 {
   "name": "super-token-wizard",
+  "description": "Superfluid's SuperToken Wizard",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "author": "Salman Dabbakuti",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

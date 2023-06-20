@@ -1,7 +1,7 @@
 {
   "name": "super-token-wizard-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Super Token Wizard Backend",
   "private": true,
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "start": "node index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Salman Dabbakuti",
   "license": "ISC",
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.2",

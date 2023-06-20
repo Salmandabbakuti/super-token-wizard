@@ -2,10 +2,6 @@
 import React, { useState } from "react";
 import { Web3Provider } from "@ethersproject/providers";
 import { ContractFactory } from "@ethersproject/contracts";
-// import {
-//   getCompilerVersions,
-//   solidityCompiler,
-// } from '@agnostico/browser-solidity-compiler';
 import {
   Input,
   Checkbox,
