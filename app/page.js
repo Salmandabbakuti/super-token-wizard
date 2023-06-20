@@ -75,6 +75,8 @@ const chains = {
   }
 };
 
+const compilerUrl = process.env.NEXT_PUBLIC_COMPILER_URL || "api/compile";
+
 export default function Home() {
   const [wizardOptions, setWizardOptions] = useState({
     premintQuantity: 1000,
@@ -229,7 +231,7 @@ export default function Home() {
         supertokenBaseImport,
         supertokenBaseImportLocalPath
       );
-      const response = await fetch("/api/compile", {
+      const response = await fetch(compilerUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
