@@ -1,25 +1,26 @@
 {
-  "name": "super-token-wizard",
-  "version": "0.1.0",
+  "name": "super-token-wizard-backend",
+  "version": "1.0.0",
+  "description": "",
   "private": true,
+  "main": "index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js --watch index.js",
+    "start": "node index.js"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@ethersproject/contracts": "^5.7.0",
-    "@ethersproject/providers": "^5.7.2",
     "@openzeppelin/contracts": "^4.9.2",
     "@superfluid-finance/ethereum-contracts": "^1.7.0",
-    "antd": "4.23.2",
     "child_process": "^1.0.2",
-    "eslint": "8.42.0",
-    "eslint-config-next": "13.4.4",
-    "hardhat": "^2.15.0",
-    "next": "13.4.4",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "hardhat": "^2.15.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
