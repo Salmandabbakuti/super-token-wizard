@@ -1,7 +1,7 @@
 export const mainContract = `// SPDX-License-Identifier: $LICENSE_IDENTIFIER$
 pragma solidity ^0.8.0;
 
-import {SuperTokenBase} from "github.com/superfluid-finance/custom-supertokens/contracts/base/SuperTokenBase.sol";
+$SUPERTOKEN_BASE_IMPORT$
 $OWNABLE_IMPORT$
 
 contract MySuperToken is SuperTokenBase$OWNABLE_INHERITANCE$ {
