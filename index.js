@@ -10,7 +10,10 @@ const execPromise = promisify(exec);
 const app = express();
 app.use(
   cors({
-    origin: "*"
+    origin: [
+      "https://super-token-wizard.vercel.app",
+      "https://super-token-wizard-develop.vercel.app"
+    ]
   })
 );
 app.use(express.json());
@@ -20,7 +23,7 @@ app.get("/", (req, res) => {
     .status(200)
     .json({
       message:
-        "Welcome to SuperToken Wizard API. Please navigate to https://super-token-wizard-develop.vercel.app/"
+        "Welcome to SuperToken Wizard API. Please navigate to https://super-token-wizard.vercel.app/"
     });
 });
 
@@ -28,18 +31,21 @@ app.post("/api/compile", async (req, res) => {
   if (!req?.body?.code)
     return res
       .status(400)
-      .json({ code: "Bad request", message: "Missing required code" });
+      .json({ code: "Bad request", message: "Missing required code parameter in body" });
+  const contractCode = req.body.code;
   const id = new Date().toISOString().replace(/[^0-9]/gi, "");
-  const fileName = `MyToken_${id}.sol`;
+  const fileName = `Contract_${id}.sol`;
   const filePath = path.join(__dirname, `contracts/${fileName}`);
+  const contractNameMatch = contractCode.match(/contract\s+(\w+)/);
+  const contractName = contractNameMatch ? contractNameMatch[1] : "Example";
   try {
-    await fs.promises.writeFile(filePath, req.body.code);
+    await fs.promises.writeFile(filePath, contractCode);
     const commandRes = await execPromise("npx hardhat compile");
     console.log("commandRes", commandRes);
 
     const artifactPath = path.join(
       __dirname,
-      `artifacts/contracts/${fileName}/MyToken.json`
+      `artifacts/contracts/${fileName}/${contractName}.json`
     );
     const artifactData = fs.readFileSync(artifactPath, "utf8");
     const { abi, bytecode } = JSON.parse(artifactData);

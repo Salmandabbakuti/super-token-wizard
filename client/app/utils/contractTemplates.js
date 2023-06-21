@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {SuperTokenBase} from "github.com/superfluid-finance/custom-supertokens/contracts/base/SuperTokenBase.sol";
 $OWNABLE_IMPORT$
 
-contract MyToken is SuperTokenBase$OWNABLE_INHERITANCE$ {
+contract MySuperToken is SuperTokenBase$OWNABLE_INHERITANCE$ {
 
 	function initialize(address factory, string memory name, string memory symbol) external {
 		_initialize(factory, name, symbol);
