@@ -60,6 +60,8 @@ export default function Home() {
   };
 
   const handleGenerateCode = () => {
+    setCompiledOutput(null);
+    setContract(null);
     const {
       licenseIdentifier,
       isOwnable,
