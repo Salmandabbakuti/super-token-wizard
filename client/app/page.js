@@ -428,11 +428,11 @@ export default function Home() {
               onChange={handleWizardOptionsChange}
             />
           </div>
-        </div>
-        <div className={styles.actions}>
-          <Button type="primary" onClick={handleGenerateCode}>
-            Generate
-          </Button>
+          <div className={styles.section}>
+            <Button type="primary" onClick={handleGenerateCode}>
+              Generate
+            </Button>
+          </div>
         </div>
         <div className={styles.code}>
           <Input.TextArea
@@ -497,12 +497,12 @@ export default function Home() {
               Initialize
             </Button>
           </div>
+          {logMessage && (
+            <div className={styles.logBox}>
+              <p>{logMessage}</p>
+            </div>
+          )}
         </div>
-        {logMessage && (
-          <div className={styles.logBox}>
-            <p>{logMessage}</p>
-          </div>
-        )}
       </div>
       <Layout.Footer style={{ textAlign: "center" }}>
         <a

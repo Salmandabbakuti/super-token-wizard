@@ -31,24 +31,24 @@
 
 .container {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   border: 1px solid #ccc;
+  background-color: #f6f8f9
 }
 
 .options {
-  display: flex;
-  flex-wrap: wrap;
+  flex: 1 0 100%;
   padding: 20px;
+  background-color: #ffffff;
 }
 
 .section {
-  flex: 1 1 100%;
   margin-bottom: 5px;
   padding: 10px;
 }
 
 .code {
-  flex: 2;
+  flex: 1;
   padding: 20px;
   height: max-content;
 }
@@ -64,34 +64,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 20px;
   padding: 5px;
-  background-color: #282c34,
-}
-
-.logBox strong {
-  margin-bottom: 5px;
-}
-
-.actions {
-  flex: 1;
-  padding: 20px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.actionsButton {
-  margin-left: 20px;
 }
 
 @media (min-width: 768px) {
   .options {
-    flex-wrap: nowrap;
+    flex: 0 0 auto;
+    width: 300px;
+    min-width: 300px;
   }
 
-  .section {
+  .code {
     flex: 1;
-    margin-right: 20px;
+    min-width: 0;
   }
 }
