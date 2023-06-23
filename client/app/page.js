@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Web3Provider } from "@ethersproject/providers";
 import { ContractFactory } from "@ethersproject/contracts";
 import {
@@ -85,7 +85,8 @@ export default function Home() {
       .replace("$PREMINT_QUANTITY$", premintQuantityValue)
       .replace("$MINT_FUNCTION$", isMintable ? mintFunction : "")
       .replace("$BURN_FUNCTION$", isBurnable ? burnFunction : "")
-      .replace("$ONLY_OWNER$", isOwnable ? "onlyOwner" : "");
+      .replace("$ONLY_OWNER$", isOwnable ? "onlyOwner" : "")
+      .replace(/(\n\s*){2,}/gm, "\n$1");
 
     setGeneratedCode(contractCode);
   };
