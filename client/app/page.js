@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Web3Provider } from "@ethersproject/providers";
 import { ContractFactory } from "@ethersproject/contracts";
 import {
@@ -25,11 +25,7 @@ import {
   burnFunction
 } from "./utils/contractTemplates";
 
-import {
-  superTokenFactoryAddresses,
-  chains,
-  isAddressValid
-} from "./utils";
+import { superTokenFactoryAddresses, chains, isAddressValid } from "./utils";
 
 const compilerUrl = process.env.NEXT_PUBLIC_COMPILER_URL || "api/compile";
 
@@ -68,11 +64,13 @@ export default function Home() {
       premintReceiver,
       premintQuantity,
       isMintable,
-      isBurnable,
+      isBurnable
     } = wizardOptions;
 
-    if (!premintQuantity) return message.error("Valid premint quantity is required");
-    if (premintReceiver && !isAddressValid(premintReceiver)) return message.error("Invalid premint receiver address");
+    if (!premintQuantity)
+      return message.error("Valid premint quantity is required");
+    if (premintReceiver && !isAddressValid(premintReceiver))
+      return message.error("Invalid premint receiver address");
 
     const premintReceiverValue = premintReceiver || "msg.sender";
     const premintQuantityValue = `${premintQuantity} * 10 ** 18`;
@@ -288,8 +286,19 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    handleGenerateCode();
+  }, [
+    wizardOptions.premintQuantity,
+    wizardOptions.premintReceiver,
+    wizardOptions.isMintable,
+    wizardOptions.isBurnable,
+    wizardOptions.isOwnable,
+    wizardOptions.licenseIdentifier
+  ]);
+
   return (
-    <>
+    <Layout>
       <div className={styles.navbar}>
         <div className={styles.logo}>
           <img
@@ -328,7 +337,7 @@ export default function Home() {
             value={selectedChainId}
             onChange={(value) => setSelectedChainId(value)}
             onSelect={(value) => handleSwitchChain(value)}
-            style={{ width: 120 }}
+            style={{ width: 140 }}
             className={styles.actionsButton}
             loading={loading.switch}
           >
@@ -429,16 +438,10 @@ export default function Home() {
               onChange={handleWizardOptionsChange}
             />
           </div>
-          <div className={styles.section}>
-            <Button type="primary" onClick={handleGenerateCode}>
-              Generate
-            </Button>
-          </div>
         </div>
         <div className={styles.code}>
           <Input.TextArea
             value={generatedCode}
-            autoSize={{ minRows: 10, maxRows: 80 }}
             style={{
               fontFamily: "monospace",
               fontSize: "14px",
@@ -452,8 +455,8 @@ export default function Home() {
             autoCapitalize="off"
             autoComplete="off"
             autoCorrect="off"
-            rows={20}
-            cols={80}
+            rows={25}
+            cols={90}
           />
           <div className={styles.codeButtons}>
             <Button onClick={handleCopyCode} disabled={!generatedCode}>
@@ -514,6 +517,6 @@ export default function Home() {
           © {new Date().getFullYear()} Salman Dabbakuti. Powered by Nextjs
         </a>
       </Layout.Footer>
-    </>
+    </Layout>
   );
 }
