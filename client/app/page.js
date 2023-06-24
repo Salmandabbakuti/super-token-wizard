@@ -27,6 +27,8 @@ import {
 
 import { superTokenFactoryAddresses, chains, isAddressValid } from "./utils";
 
+const { Content, Footer } = Layout;
+
 const compilerUrl = process.env.NEXT_PUBLIC_COMPILER_URL || "api/compile";
 
 export default function Home() {
@@ -298,7 +300,7 @@ export default function Home() {
   ]);
 
   return (
-    <Layout>
+    <Layout style={{ minHeight: "100vh" }}>
       <div className={styles.navbar}>
         <div className={styles.logo}>
           <img
@@ -349,166 +351,171 @@ export default function Home() {
           </Select>
         </div>
       </div>
-      <div className={styles.container}>
-        <div className={styles.options}>
-          <div className={styles.section}>
-            <h3>Token Options</h3>
-            <label htmlFor="tokenName">Name</label>
-            <Input
-              id="tokenName"
-              name="tokenName"
-              placeholder="Name"
-              value={wizardOptions?.tokenName}
-              onChange={handleWizardOptionsChange}
-            />
-            <label htmlFor="tokenSymbol">Symbol</label>
-            <Input
-              id="tokenSymbol"
-              name="tokenSymbol"
-              placeholder="Symbol"
-              value={wizardOptions?.tokenSymbol}
-              onChange={handleWizardOptionsChange}
-            />
-            <label htmlFor="premintQuantity">Premint Quantity</label>
-            <Input
-              id="premintQuantity"
-              name="premintQuantity"
-              type="number"
-              placeholder="Premint Quantity"
-              value={wizardOptions?.premintQuantity}
-              onChange={handleWizardOptionsChange}
-            />
-            <label htmlFor="premintReceiver">Premint Receiver</label>
-            <Input
-              id="premintReceiver"
-              name="premintReceiver"
-              type="text"
-              placeholder="Premint Receiver Address"
-              value={wizardOptions?.premintReceiver}
-              maxLength={42}
-              minLength={42}
-              onChange={handleWizardOptionsChange}
-            />
-          </div>
-          <div className={styles.section}>
-            <h3>Features</h3>
-            <Space direction="vertical">
-              <Checkbox
-                checked={wizardOptions?.isMintable}
-                onChange={(e) =>
-                  setWizardOptions({
-                    ...wizardOptions,
-                    isMintable: e.target.checked
-                  })
-                }
-              >
-                Mintable
-              </Checkbox>
-              <Checkbox
-                checked={wizardOptions?.isBurnable}
-                onChange={(e) =>
-                  setWizardOptions({
-                    ...wizardOptions,
-                    isBurnable: e.target.checked
-                  })
-                }
-              >
-                Burnable
-              </Checkbox>
-              <Checkbox
-                checked={wizardOptions?.isOwnable}
-                onChange={(e) =>
-                  setWizardOptions({
-                    ...wizardOptions,
-                    isOwnable: e.target.checked
-                  })
-                }
-              >
-                Ownable
-              </Checkbox>
-            </Space>
-          </div>
-          <div className={styles.section}>
-            <h3>Miscellaneous</h3>
-            <label htmlFor="licenseIdentifier">License Identifier</label>
-            <Input
-              name="licenseIdentifier"
-              placeholder="License Identifier"
-              value={wizardOptions?.licenseIdentifier}
-              onChange={handleWizardOptionsChange}
-            />
-          </div>
-        </div>
-        <div className={styles.code}>
-          <Input.TextArea
-            value={generatedCode}
-            style={{
-              fontFamily: "monospace",
-              fontSize: "14px",
-              backgroundColor: "#282c34",
-              color: "#fff",
-              width: "100%",
-              height: "100%"
-            }}
-            readOnly
-            spellCheck="false"
-            autoCapitalize="off"
-            autoComplete="off"
-            autoCorrect="off"
-            rows={25}
-            cols={90}
-          />
-          <div className={styles.codeButtons}>
-            <Button onClick={handleCopyCode} disabled={!generatedCode}>
-              Copy Code
-            </Button>
-            <Link
-              href={`https://remix.ethereum.org/?#code=${btoa(generatedCode)}`}
-              target="_blank"
-            >
-              <Button disabled={!generatedCode}>Open in Remix</Button>
-            </Link>
-            <Button
-              type="primary"
-              onClick={handleCompile}
-              disabled={!generatedCode || loading.compile}
-              loading={loading.compile}
-            >
-              Compile
-            </Button>
-
-            <Button
-              type="primary"
-              onClick={handleCopyArtifacts}
-              disabled={!compiledOutput?.bytecode}
-            >
-              Copy Artifacts
-            </Button>
-            <Button
-              type="primary"
-              onClick={handleDeploy}
-              disabled={!compiledOutput?.bytecode || loading.deploy}
-              loading={loading.deploy}
-            >
-              Deploy
-            </Button>
-            <Button
-              type="primary"
-              disabled={!contract || loading.initialize}
-              onClick={handleInitialize}
-              loading={loading.initialize}
-            >
-              Initialize
-            </Button>
-          </div>
-          {logMessage && (
-            <div className={styles.logBox}>
-              <p>{logMessage}</p>
+      <Content style={{ minHeight: 300 }}>
+        <div className={styles.container}>
+          <div className={styles.options}>
+            <div className={styles.section}>
+              <h3>Token Options</h3>
+              <label htmlFor="tokenName">Name</label>
+              <Input
+                id="tokenName"
+                name="tokenName"
+                placeholder="Name"
+                value={wizardOptions?.tokenName}
+                onChange={handleWizardOptionsChange}
+              />
+              <label htmlFor="tokenSymbol">Symbol</label>
+              <Input
+                id="tokenSymbol"
+                name="tokenSymbol"
+                placeholder="Symbol"
+                value={wizardOptions?.tokenSymbol}
+                onChange={handleWizardOptionsChange}
+              />
+              <label htmlFor="premintQuantity">Premint Quantity</label>
+              <Input
+                id="premintQuantity"
+                name="premintQuantity"
+                type="number"
+                placeholder="Premint Quantity"
+                value={wizardOptions?.premintQuantity}
+                onChange={handleWizardOptionsChange}
+              />
+              <label htmlFor="premintReceiver">Premint Receiver</label>
+              <Input
+                id="premintReceiver"
+                name="premintReceiver"
+                type="text"
+                placeholder="Premint Receiver Address"
+                value={wizardOptions?.premintReceiver}
+                maxLength={42}
+                minLength={42}
+                onChange={handleWizardOptionsChange}
+              />
             </div>
-          )}
+            <div className={styles.section}>
+              <h3>Features</h3>
+              <Space direction="vertical">
+                <Checkbox
+                  checked={wizardOptions?.isMintable}
+                  onChange={(e) =>
+                    setWizardOptions({
+                      ...wizardOptions,
+                      isMintable: e.target.checked
+                    })
+                  }
+                >
+                  Mintable
+                </Checkbox>
+                <Checkbox
+                  checked={wizardOptions?.isBurnable}
+                  onChange={(e) =>
+                    setWizardOptions({
+                      ...wizardOptions,
+                      isBurnable: e.target.checked
+                    })
+                  }
+                >
+                  Burnable
+                </Checkbox>
+                <Checkbox
+                  checked={wizardOptions?.isOwnable}
+                  onChange={(e) =>
+                    setWizardOptions({
+                      ...wizardOptions,
+                      isOwnable: e.target.checked
+                    })
+                  }
+                >
+                  Ownable
+                </Checkbox>
+              </Space>
+            </div>
+            <div className={styles.section}>
+              <h3>Miscellaneous</h3>
+              <label htmlFor="licenseIdentifier">License Identifier</label>
+              <Input
+                name="licenseIdentifier"
+                placeholder="License Identifier"
+                value={wizardOptions?.licenseIdentifier}
+                onChange={handleWizardOptionsChange}
+              />
+            </div>
+          </div>
+          <div className={styles.code}>
+            <Input.TextArea
+              value={generatedCode}
+              style={{
+                fontFamily: "monospace",
+                fontSize: "14px",
+                backgroundColor: "#1f2430",
+                color: "#fff",
+                width: "100%",
+                height: "100%",
+                whiteSpace: "pre"
+              }}
+              readOnly
+              spellCheck="false"
+              autoCapitalize="off"
+              autoComplete="off"
+              autoCorrect="off"
+              rows={25}
+              cols={90}
+            />
+            <div className={styles.codeButtons}>
+              <Button onClick={handleCopyCode} disabled={!generatedCode}>
+                Copy Code
+              </Button>
+              <Link
+                href={`https://remix.ethereum.org/?#code=${btoa(
+                  generatedCode
+                )}`}
+                target="_blank"
+              >
+                <Button disabled={!generatedCode}>Open in Remix</Button>
+              </Link>
+              <Button
+                type="primary"
+                onClick={handleCompile}
+                disabled={!generatedCode || loading.compile}
+                loading={loading.compile}
+              >
+                Compile
+              </Button>
+
+              <Button
+                type="primary"
+                onClick={handleCopyArtifacts}
+                disabled={!compiledOutput?.bytecode}
+              >
+                Copy Artifacts
+              </Button>
+              <Button
+                type="primary"
+                onClick={handleDeploy}
+                disabled={!compiledOutput?.bytecode || loading.deploy}
+                loading={loading.deploy}
+              >
+                Deploy
+              </Button>
+              <Button
+                type="primary"
+                disabled={!contract || loading.initialize}
+                onClick={handleInitialize}
+                loading={loading.initialize}
+              >
+                Initialize
+              </Button>
+            </div>
+            {logMessage && (
+              <div className={styles.logBox}>
+                <p>{logMessage}</p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-      <Layout.Footer style={{ textAlign: "center" }}>
+      </Content>
+      <Footer style={{ textAlign: "center" }}>
         <a
           href="https://github.com/Salmandabbakuti"
           target="_blank"
@@ -516,7 +523,7 @@ export default function Home() {
         >
           © {new Date().getFullYear()} Salman Dabbakuti. Powered by Nextjs
         </a>
-      </Layout.Footer>
+      </Footer>
     </Layout>
   );
 }

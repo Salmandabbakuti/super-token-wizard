@@ -49,7 +49,7 @@ export const chains = {
   },
   56: {
     chainId: "0x38",
-    chainName: "BSC Mainnet",
+    chainName: "Binance Mainnet",
     nativeCurrency: {
       name: "BNB",
       symbol: "BNB",
