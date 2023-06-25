@@ -74,10 +74,11 @@ export default function Home() {
     if (premintReceiver && !isAddressValid(premintReceiver))
       return message.error("Invalid premint receiver address");
 
+    const licenseIdentifierValue = licenseIdentifier || "UNLICENSED";
     const premintReceiverValue = premintReceiver || "msg.sender";
     const premintQuantityValue = `${premintQuantity} * 10 ** 18`;
     const contractCode = mainContract
-      .replace("$LICENSE_IDENTIFIER$", licenseIdentifier || "UNLICENSED")
+      .replace("$LICENSE_IDENTIFIER$", licenseIdentifierValue)
       .replace("$SUPERTOKEN_BASE_IMPORT$", supertokenBaseImport)
       .replace("$OWNABLE_IMPORT$", isOwnable ? ownableImport : "")
       .replace("$OWNABLE_INHERITANCE$", isOwnable ? ", Ownable" : "")
