@@ -77,7 +77,7 @@ export default function Home() {
     const premintReceiverValue = premintReceiver || "msg.sender";
     const premintQuantityValue = `${premintQuantity} * 10 ** 18`;
     const contractCode = mainContract
-      .replace("$LICENSE_IDENTIFIER$", licenseIdentifier)
+      .replace("$LICENSE_IDENTIFIER$", licenseIdentifier || "UNLICENSED")
       .replace("$SUPERTOKEN_BASE_IMPORT$", supertokenBaseImport)
       .replace("$OWNABLE_IMPORT$", isOwnable ? ownableImport : "")
       .replace("$OWNABLE_INHERITANCE$", isOwnable ? ", Ownable" : "")
