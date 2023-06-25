@@ -390,6 +390,7 @@ export default function Home() {
                 value={wizardOptions?.premintReceiver}
                 maxLength={42}
                 minLength={42}
+                allowClear
                 onChange={handleWizardOptionsChange}
               />
             </div>
