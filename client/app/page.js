@@ -12,6 +12,7 @@ import {
   Space,
   Layout
 } from "antd";
+import { CodeBlock, CopyBlock, monoBlue, dracula } from "react-code-blocks";
 import Link from "next/link";
 import styles from "./page.module.css";
 import "antd/dist/antd.css";
@@ -443,7 +444,22 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.code}>
-            <Input.TextArea
+            <CodeBlock
+              text={generatedCode}
+              language="js"
+              showLineNumbers={false}
+              theme={dracula}
+              customStyle={{
+                fontFamily: "monospace",
+                fontSize: "14px",
+                backgroundColor: "#1f2430",
+                color: "#fff",
+                width: "100%",
+                height: "100%",
+                whiteSpace: "pre"
+              }}
+            />
+            {/* <Input.TextArea
               value={generatedCode}
               style={{
                 fontFamily: "monospace",
@@ -461,7 +477,7 @@ export default function Home() {
               autoCorrect="off"
               rows={25}
               cols={90}
-            />
+            /> */}
             <div className={styles.codeButtons}>
               <Button onClick={handleCopyCode} disabled={!generatedCode}>
                 Copy Code
