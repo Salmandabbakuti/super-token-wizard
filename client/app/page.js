@@ -543,7 +543,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          © {new Date().getFullYear()} Salman Dabbakuti. Powered by Nextjs
+          Made with ❤️ by Salman Dabbakuti.Powered by Nextjs & Ant Design
         </a>
       </Footer>
     </Layout>
