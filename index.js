@@ -37,20 +37,19 @@ app.post("/api/compile", async (req, res) => {
   const id = new Date().toISOString().replace(/[^0-9]/gi, "");
   const fileName = `Contract_${id}.sol`;
   const filePath = path.join(__dirname, `contracts/${fileName}`);
-  const contractNameMatch = contractCode.match(/contract\s+(\w+)/);
-  const contractName = contractNameMatch ? contractNameMatch[1] : "Example";
   try {
     await fs.promises.writeFile(filePath, contractCode);
     const commandRes = await execPromise("npx hardhat compile");
     console.log("commandRes", commandRes);
-
+    const contractNameMatch = contractCode.match(/contract\s+(\w+)/);
+    const contractName = contractNameMatch ? contractNameMatch[1] : "Example";
     const artifactPath = path.join(
       __dirname,
       `artifacts/contracts/${fileName}/${contractName}.json`
     );
+
     const artifactData = fs.readFileSync(artifactPath, "utf8");
     const { abi, bytecode } = JSON.parse(artifactData);
-
     return res.status(200).json({ abi, bytecode });
   } catch (err) {
     console.log(`Error while compiling: ${err.message}`);

@@ -233,7 +233,7 @@ export default function Home() {
   };
 
   const handleDeploy = async () => {
-    if (!provider) return message.error("Please connect your wallet first");
+    if (!account || !provider) return message.error("Please connect your wallet first");
     if (!compiledOutput?.abi?.length || !compiledOutput?.bytecode)
       return message.error("Please compile the code first");
     setLoading({ deploy: true });
@@ -260,7 +260,7 @@ export default function Home() {
   };
 
   const handleInitialize = async () => {
-    if (!provider) return message.error("Please connect your wallet first");
+    if (!account || !provider) return message.error("Please connect your wallet first");
     if (!contract) return message.error("Please deploy the contract first");
     if (
       /^\s*$/.test(wizardOptions?.tokenName) ||
