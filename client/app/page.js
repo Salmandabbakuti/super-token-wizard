@@ -543,7 +543,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Made with ❤️ by Salman Dabbakuti.Powered by Nextjs & Ant Design
+          Made with ❤️ by Salman Dabbakuti. Powered by Nextjs & Ant Design
         </a>
       </Footer>
     </Layout>
