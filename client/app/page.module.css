@@ -23,7 +23,6 @@
 .remixLogo {
   width: 15px;
   height: 15px;
-  margin-right: 5px;
 }
 
 .logoText {
@@ -57,6 +56,15 @@
   flex: 1;
   padding: 8px;
   height: max-content;
+}
+
+.codeHeader {
+  position: relative;
+  float: right;
+  display: flex;
+  gap: 5px;
+  z-index: 1;
+  margin: 5px 5px -40px 0;
 }
 
 .codeButtons {

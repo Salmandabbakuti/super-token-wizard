@@ -447,6 +447,32 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.code}>
+            <div className={styles.codeHeader}>
+              <Button
+                type="primary"
+                icon={<CopyOutlined />}
+                onClick={handleCopyCode}
+                disabled={!generatedCode}
+              />
+              <Link
+                href={`https://remix.ethereum.org/?#code=${btoa(
+                  generatedCode
+                )}`}
+                target="_blank"
+              >
+                <Button
+                  type="primary"
+                  icon={
+                    <img
+                      src="/remix_logo.svg"
+                      alt="remix-logo"
+                      className={styles.remixLogo}
+                    />
+                  }
+                  disabled={!generatedCode}
+                />
+              </Link>
+            </div>
             <Input.TextArea
               value={generatedCode}
               style={{
@@ -467,34 +493,6 @@ export default function Home() {
               cols={90}
             />
             <div className={styles.codeButtons}>
-              <Button
-                icon={<CopyOutlined />}
-                onClick={handleCopyCode}
-                disabled={!generatedCode}
-              >
-                Code
-              </Button>
-              <Link
-                href={`https://remix.ethereum.org/?#code=${btoa(
-                  generatedCode
-                )}`}
-                target="_blank"
-              >
-                <Button
-                  icon={
-                    <img
-                      src="/remix_logo.svg"
-                      alt="remix-logo"
-                      width={15}
-                      height={15}
-                      className={styles.remixLogo}
-                    />
-                  }
-                  disabled={!generatedCode}
-                >
-                  Open in Remix
-                </Button>
-              </Link>
               <Button
                 type="primary"
                 icon={<SendOutlined />}
