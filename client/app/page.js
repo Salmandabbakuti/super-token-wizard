@@ -16,6 +16,7 @@ import {
 import {
   CopyOutlined,
   WalletOutlined,
+  WalletFilled,
   ThunderboltOutlined,
   LinkOutlined,
   SendOutlined
@@ -107,7 +108,7 @@ export default function Home() {
 
   const handleConnectWallet = async () => {
     if (!window?.ethereum)
-      return message.warning(
+      return message.error(
         "Please install Metamask or any other web3 enabled browser"
       );
     setLoading({ connect: true });
@@ -124,11 +125,13 @@ export default function Home() {
       setSelectedChainId(
         selectedChain ? chainId?.toString() : "⚠ Unsupported chain"
       );
-      if (!selectedChain)
+      setAccount(account1);
+      if (!selectedChain) {
+        setLoading({ connect: false });
         return message.error(
           "Unsupported chain. Please switch to supported chain"
         );
-      setAccount(account1);
+      }
       setProvider(provider);
       message.success("Wallet connected");
       setLoading({ connect: false });
@@ -147,7 +150,7 @@ export default function Home() {
 
   const handleSwitchChain = async (selectedChainId) => {
     if (!window?.ethereum)
-      return message.warning(
+      return message.error(
         "Please install Metamask or any other web3 enabled browser"
       );
     console.log("Selected chainId:", selectedChainId);
@@ -233,7 +236,8 @@ export default function Home() {
   };
 
   const handleDeploy = async () => {
-    if (!account || !provider) return message.error("Please connect your wallet first");
+    if (!account || !provider)
+      return message.error("Please connect your wallet first");
     if (!compiledOutput?.abi?.length || !compiledOutput?.bytecode)
       return message.error("Please compile the code first");
     setLoading({ deploy: true });
@@ -260,7 +264,8 @@ export default function Home() {
   };
 
   const handleInitialize = async () => {
-    if (!account || !provider) return message.error("Please connect your wallet first");
+    if (!account || !provider)
+      return message.error("Please connect your wallet first");
     if (!contract) return message.error("Please deploy the contract first");
     if (
       /^\s*$/.test(wizardOptions?.tokenName) ||
@@ -317,17 +322,35 @@ export default function Home() {
         </div>
         <div className={styles.navbarButtons}>
           {account ? (
-            <Button
-              icon={<WalletOutlined />}
-              type="secondary"
-              onClick={handleDisconnectWallet}
-              className={styles.actionsButton}
-            >
-              {account.slice(0, 8) + "..." + account.slice(-5)}
-            </Button>
+            <>
+              <Button
+                icon={<WalletOutlined />}
+                type="secondary"
+                onClick={handleDisconnectWallet}
+                className={styles.actionsButton}
+              >
+                {account.slice(0, 8) + "..." + account.slice(-5)}
+              </Button>
+              <Select
+                name="chainId"
+                id="chainId"
+                value={selectedChainId}
+                onChange={(value) => setSelectedChainId(value)}
+                onSelect={(value) => handleSwitchChain(value)}
+                style={{ width: 140 }}
+                className={styles.actionsButton}
+                loading={loading.switch}
+              >
+                {Object.keys(chains).map((chainId) => (
+                  <Select.Option key={chainId} value={chainId}>
+                    {chains[chainId]?.chainName?.split(" ")[0]}
+                  </Select.Option>
+                ))}
+              </Select>
+            </>
           ) : (
             <Button
-              icon={<WalletOutlined />}
+              icon={<WalletFilled />}
               type="secondary"
               onClick={handleConnectWallet}
               className={styles.actionsButton}
@@ -336,22 +359,6 @@ export default function Home() {
               Connect Wallet
             </Button>
           )}
-          <Select
-            name="chainId"
-            id="chainId"
-            value={selectedChainId}
-            onChange={(value) => setSelectedChainId(value)}
-            onSelect={(value) => handleSwitchChain(value)}
-            style={{ width: 140 }}
-            className={styles.actionsButton}
-            loading={loading.switch}
-          >
-            {Object.keys(chains).map((chainId) => (
-              <Select.Option key={chainId} value={chainId}>
-                {chains[chainId]?.chainName?.split(" ")[0]}
-              </Select.Option>
-            ))}
-          </Select>
         </div>
       </div>
       <Content style={{ minHeight: 300 }}>
@@ -401,6 +408,7 @@ export default function Home() {
               <h3>Features</h3>
               <Space direction="vertical">
                 <Checkbox
+                  id="isMintable"
                   checked={wizardOptions?.isMintable}
                   onChange={(e) =>
                     setWizardOptions({
@@ -412,6 +420,7 @@ export default function Home() {
                   Mintable
                 </Checkbox>
                 <Checkbox
+                  id="isBurnable"
                   checked={wizardOptions?.isBurnable}
                   onChange={(e) =>
                     setWizardOptions({
@@ -423,6 +432,7 @@ export default function Home() {
                   Burnable
                 </Checkbox>
                 <Checkbox
+                  id="isOwnable"
                   checked={wizardOptions?.isOwnable}
                   onChange={(e) =>
                     setWizardOptions({
@@ -439,6 +449,7 @@ export default function Home() {
               <h3>Miscellaneous</h3>
               <label htmlFor="licenseIdentifier">License Identifier</label>
               <Input
+                id="licenseIdentifier"
                 name="licenseIdentifier"
                 placeholder="License Identifier"
                 value={wizardOptions?.licenseIdentifier}
@@ -474,6 +485,7 @@ export default function Home() {
               </Link>
             </div>
             <Input.TextArea
+              id="generatedCode"
               value={generatedCode}
               style={{
                 fontFamily: "monospace",
