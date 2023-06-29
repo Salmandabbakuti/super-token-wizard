@@ -366,23 +366,25 @@ export default function Home() {
           <div className={styles.options}>
             <div className={styles.section}>
               <h3>Token Options</h3>
-              <label htmlFor="tokenName">Name</label>
+              <label htmlFor="tokenName">Name *</label>
               <Input
                 id="tokenName"
                 name="tokenName"
                 placeholder="Name"
                 value={wizardOptions?.tokenName}
                 onChange={handleWizardOptionsChange}
+                maxLength={32}
               />
-              <label htmlFor="tokenSymbol">Symbol</label>
+              <label htmlFor="tokenSymbol">Symbol *</label>
               <Input
                 id="tokenSymbol"
                 name="tokenSymbol"
                 placeholder="Symbol"
                 value={wizardOptions?.tokenSymbol}
                 onChange={handleWizardOptionsChange}
+                maxLength={15}
               />
-              <label htmlFor="premintQuantity">Premint Quantity</label>
+              <label htmlFor="premintQuantity">Premint Quantity *</label>
               <Input
                 id="premintQuantity"
                 name="premintQuantity"
@@ -391,6 +393,8 @@ export default function Home() {
                 value={wizardOptions?.premintQuantity}
                 onChange={handleWizardOptionsChange}
                 status={!wizardOptions?.premintQuantity ? "error" : ""}
+                min={1}
+                max={1000000000000}
               />
               <label htmlFor="premintReceiver">Premint Receiver</label>
               <Input
@@ -400,7 +404,6 @@ export default function Home() {
                 placeholder="Premint Receiver Address"
                 value={wizardOptions?.premintReceiver}
                 maxLength={42}
-                minLength={42}
                 allowClear
                 status={
                   wizardOptions?.premintReceiver &&
@@ -461,6 +464,7 @@ export default function Home() {
                 placeholder="License Identifier"
                 value={wizardOptions?.licenseIdentifier}
                 onChange={handleWizardOptionsChange}
+                maxLength={32}
               />
             </div>
           </div>
@@ -470,6 +474,7 @@ export default function Home() {
                 icon={<CopyOutlined />}
                 onClick={handleCopyCode}
                 disabled={!generatedCode}
+                title="Copy Code"
               />
               <Link
                 href={`https://remix.ethereum.org/?#code=${btoa(
@@ -478,6 +483,8 @@ export default function Home() {
                 target="_blank"
               >
                 <Button
+                  disabled={!generatedCode}
+                  title="Open in Remix"
                   icon={
                     <img
                       src="/remix_logo.svg"
@@ -485,7 +492,6 @@ export default function Home() {
                       className={styles.remixLogo}
                     />
                   }
-                  disabled={!generatedCode}
                 />
               </Link>
             </div>
@@ -524,6 +530,7 @@ export default function Home() {
                 icon={<CopyOutlined />}
                 onClick={handleCopyArtifacts}
                 disabled={!compiledOutput?.bytecode}
+                title="Copy Artifacts"
               >
                 Artifacts
               </Button>
