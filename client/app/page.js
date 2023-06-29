@@ -390,6 +390,7 @@ export default function Home() {
                 placeholder="Premint Quantity"
                 value={wizardOptions?.premintQuantity}
                 onChange={handleWizardOptionsChange}
+                status={!wizardOptions?.premintQuantity ? "error" : ""}
               />
               <label htmlFor="premintReceiver">Premint Receiver</label>
               <Input
@@ -401,6 +402,12 @@ export default function Home() {
                 maxLength={42}
                 minLength={42}
                 allowClear
+                status={
+                  wizardOptions?.premintReceiver &&
+                    !isAddressValid(wizardOptions?.premintReceiver)
+                    ? "error"
+                    : ""
+                }
                 onChange={handleWizardOptionsChange}
               />
             </div>
@@ -460,7 +467,6 @@ export default function Home() {
           <div className={styles.code}>
             <div className={styles.codeHeader}>
               <Button
-                type="primary"
                 icon={<CopyOutlined />}
                 onClick={handleCopyCode}
                 disabled={!generatedCode}
@@ -472,7 +478,6 @@ export default function Home() {
                 target="_blank"
               >
                 <Button
-                  type="primary"
                   icon={
                     <img
                       src="/remix_logo.svg"

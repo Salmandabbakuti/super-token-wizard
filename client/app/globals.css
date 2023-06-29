@@ -96,11 +96,8 @@ a {
 }
 
 .ant-input,
+.ant-btn,
 .ant-input-affix-wrapper,
 .ant-select-selector {
-  border-radius: 8px !important;
-}
-
-.ant-btn {
   border-radius: 8px !important;
 }
