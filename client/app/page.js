@@ -143,49 +143,47 @@ export default function Home() {
       return message.warning(
         "Please install Metamask or any other web3 enabled browser"
       );
-    console.log("selectedChainId", selectedChainId);
+    console.log("Selected chainId:", selectedChainId);
     const selectedChain = chains[selectedChainId];
     if (!selectedChain) return message.error("Unsupported chain selected");
     setLoading({ switch: true });
     try {
-      await window.ethereum
-        .request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: selectedChain.chainId }]
-        })
-        .then(() => message.success(`Switched to ${selectedChain.chainName}`))
-        .catch(async (err) => {
-          console.log("err on switch", err);
-          // This error code indicates that the chain has not been added to MetaMask.
-          if (err.code === 4902) {
-            message.info(`Adding ${selectedChain.chainName} to metamask`);
-            await window.ethereum
-              .request({
-                method: "wallet_addEthereumChain",
-                params: [selectedChain]
-              })
-              .then(() =>
-                message.info(`Added ${selectedChain.chainName} to metamask`)
-              )
-              .catch((err) => {
-                message.error(
-                  `Failed to add ${selectedChain.chainName} to metamask`
-                );
-                console.error(err);
-              });
-          } else {
-            message.error(`Failed switching to ${selectedChain.chainName}`);
-          }
-        });
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: selectedChain.chainId }]
+      });
       const provider = new Web3Provider(window.ethereum);
       const { chainId } = await provider.getNetwork();
-      console.log("switched chainId:", chainId);
+      console.log("Switched chainId:", chainId);
       setProvider(provider);
-      setLoading({ switch: false });
+      message.success(`Switched to ${selectedChain.chainName}`);
     } catch (err) {
+      if (err.code === 4902) {
+        // This error code indicates that the chain has not been added to MetaMask.
+        message.info(`Adding ${selectedChain.chainName} to metamask`);
+        try {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [selectedChain]
+          });
+          const provider = new Web3Provider(window.ethereum);
+          const { chainId } = await provider.getNetwork();
+          console.log("switched chainId:", chainId);
+          if (chainId != selectedChainId)
+            return message.error(
+              `Failed switching to ${selectedChain.chainName}`
+            );
+          setProvider(provider);
+          message.success(`Switched to ${selectedChain.chainName}`);
+        } catch (err) {
+          console.error("Error adding chain:", err);
+          message.error(`Failed to add ${selectedChain.chainName} to metamask`);
+        }
+      } else {
+        message.error(`Failed switching to ${selectedChain.chainName}`);
+      }
+    } finally {
       setLoading({ switch: false });
-      console.log("err switching chain:", err);
-      message.error("Failed to switch chain!");
     }
   };
 

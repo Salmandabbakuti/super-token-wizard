@@ -77,7 +77,7 @@ body {
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 16px;
   line-height: 1.5;
   color: #333;
@@ -96,6 +96,7 @@ a {
 }
 
 .ant-input,
+.ant-input-affix-wrapper,
 .ant-select-selector {
   border-radius: 8px !important;
 }
