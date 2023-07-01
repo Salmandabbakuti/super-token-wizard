@@ -12,7 +12,8 @@ app.use(
   cors({
     origin: [
       "https://super-token-wizard.vercel.app",
-      "https://super-token-wizard-develop.vercel.app"
+      "https://super-token-wizard-develop.vercel.app",
+      "http://localhost:3000"
     ]
   })
 );
@@ -51,9 +52,9 @@ app.post("/api/compile", async (req, res) => {
     const { abi, bytecode } = JSON.parse(artifactData);
 
     return res.status(200).json({ abi, bytecode });
-  } catch (error) {
-    console.log(`api error: ${error.message}`);
-    return res.status(500).json({ code: "500", message: "Compilation failed" });
+  } catch (err) {
+    console.log(`Error while compiling: ${err.message}`);
+    return res.status(500).json({ code: "Compilation Error", message: err.message });
   } finally {
     fs.unlinkSync(filePath);
     fs.rmSync(path.join(__dirname, `artifacts/contracts/${fileName}`), {

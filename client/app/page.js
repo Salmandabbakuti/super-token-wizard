@@ -203,15 +203,10 @@ export default function Home() {
         },
         body: JSON.stringify({ code: codeForCompilation })
       });
-
-      if (!response.ok) {
-        setLoading({ compile: false });
-        return message.error("Something went wrong while compiling the code");
-      }
       const data = await response.json();
       if (data.code && data.message) {
         setLoading({ compile: false });
-        return message.error("Something went wrong while compiling the code");
+        return message.error(data.message);
       }
       setCompiledOutput(data);
       setLoading({ compile: false });
