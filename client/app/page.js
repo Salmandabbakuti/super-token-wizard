@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Web3Provider } from "@ethersproject/providers";
 import { ContractFactory } from "@ethersproject/contracts";
 import {
@@ -12,7 +13,13 @@ import {
   Space,
   Layout
 } from "antd";
-import Link from "next/link";
+import {
+  CopyOutlined,
+  WalletOutlined,
+  ThunderboltOutlined,
+  LinkOutlined,
+  SendOutlined
+} from "@ant-design/icons";
 import styles from "./page.module.css";
 import "antd/dist/antd.css";
 
@@ -311,6 +318,7 @@ export default function Home() {
         <div className={styles.navbarButtons}>
           {account ? (
             <Button
+              icon={<WalletOutlined />}
               type="secondary"
               onClick={handleDisconnectWallet}
               className={styles.actionsButton}
@@ -319,6 +327,7 @@ export default function Home() {
             </Button>
           ) : (
             <Button
+              icon={<WalletOutlined />}
               type="secondary"
               onClick={handleConnectWallet}
               className={styles.actionsButton}
@@ -458,8 +467,12 @@ export default function Home() {
               cols={90}
             />
             <div className={styles.codeButtons}>
-              <Button onClick={handleCopyCode} disabled={!generatedCode}>
-                Copy Code
+              <Button
+                icon={<CopyOutlined />}
+                onClick={handleCopyCode}
+                disabled={!generatedCode}
+              >
+                Code
               </Button>
               <Link
                 href={`https://remix.ethereum.org/?#code=${btoa(
@@ -467,10 +480,24 @@ export default function Home() {
                 )}`}
                 target="_blank"
               >
-                <Button disabled={!generatedCode}>Open in Remix</Button>
+                <Button
+                  icon={
+                    <img
+                      src="/remix_logo.svg"
+                      alt="remix-logo"
+                      width={15}
+                      height={15}
+                      className={styles.remixLogo}
+                    />
+                  }
+                  disabled={!generatedCode}
+                >
+                  Open in Remix
+                </Button>
               </Link>
               <Button
                 type="primary"
+                icon={<SendOutlined />}
                 onClick={handleCompile}
                 disabled={!generatedCode || loading.compile}
                 loading={loading.compile}
@@ -479,14 +506,15 @@ export default function Home() {
               </Button>
 
               <Button
-                type="primary"
+                icon={<CopyOutlined />}
                 onClick={handleCopyArtifacts}
                 disabled={!compiledOutput?.bytecode}
               >
-                Copy Artifacts
+                Artifacts
               </Button>
               <Button
                 type="primary"
+                icon={<ThunderboltOutlined />}
                 onClick={handleDeploy}
                 disabled={!compiledOutput?.bytecode || loading.deploy}
                 loading={loading.deploy}
@@ -495,6 +523,7 @@ export default function Home() {
               </Button>
               <Button
                 type="primary"
+                icon={<LinkOutlined />}
                 disabled={!contract || loading.initialize}
                 onClick={handleInitialize}
                 loading={loading.initialize}
