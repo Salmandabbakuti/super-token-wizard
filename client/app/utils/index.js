@@ -7,7 +7,7 @@ export const superTokenFactoryAddresses = {
   1: "0x0422689cc4087b6B7280e0a7e7F655200ec86Ae1",
   56: "0x8bde47397301F0Cd31b9000032fD517a39c946Eb",
   43114: "0x464AADdBB2B80f3Cb666522EB7381bE610F638b4",
-  43113: "0x1C92042426B6bAAe497bEf461B6d8342D03aEc92",
+  42220: "0x36be86dEe6BC726Ed0Cbd170ccD2F21760BC73D9"
 };
 
 export const chains = {
@@ -69,17 +69,17 @@ export const chains = {
     rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
     blockExplorerUrls: ["https://snowtrace.io/"]
   },
-  43113: {
-    chainId: "0xa869",
-    chainName: "Avalanche-Fuji Testnet",
+  42220: {
+    chainId: "0xa4ec",
+    chainName: "Celo Mainnet",
     nativeCurrency: {
-      name: "AVAX",
-      symbol: "AVAX",
+      name: "CELO",
+      symbol: "CELO",
       decimals: 18
     },
-    rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc"],
-    blockExplorerUrls: ["https://testnet.snowtrace.io/"]
-  },
+    rpcUrls: ["https://forno.celo.org"],
+    blockExplorerUrls: ["https://explorer.celo.org"]
+  }
 };
 
 export const isAddressValid = (address) => {
