@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Web3Provider } from "@ethersproject/providers";
 import { ContractFactory } from "@ethersproject/contracts";
 import {
@@ -309,7 +310,7 @@ export default function Home() {
     <Layout style={{ minHeight: "100vh" }}>
       <div className={styles.navbar}>
         <div className={styles.logo}>
-          <img
+          <Image
             src="/wizard_logo.svg"
             alt="Logo"
             className={styles.logoImage}
@@ -486,10 +487,12 @@ export default function Home() {
                   disabled={!generatedCode}
                   title="Open in Remix"
                   icon={
-                    <img
+                    <Image
                       src="/remix_logo.svg"
                       alt="remix-logo"
                       className={styles.remixLogo}
+                      width={15}
+                      height={15}
                     />
                   }
                 />
