@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Web3Provider } from "@ethersproject/providers";
 import { ContractFactory } from "@ethersproject/contracts";
 import {
@@ -12,7 +13,14 @@ import {
   Space,
   Layout
 } from "antd";
-import Link from "next/link";
+import {
+  CopyOutlined,
+  WalletOutlined,
+  WalletFilled,
+  ThunderboltOutlined,
+  LinkOutlined,
+  SendOutlined
+} from "@ant-design/icons";
 import styles from "./page.module.css";
 import "antd/dist/antd.css";
 
@@ -25,11 +33,9 @@ import {
   burnFunction
 } from "./utils/contractTemplates";
 
-import {
-  superTokenFactoryAddresses,
-  chains,
-  isAddressValid
-} from "./utils";
+import { superTokenFactoryAddresses, chains, isAddressValid } from "./utils";
+
+const { Content, Footer } = Layout;
 
 const compilerUrl = process.env.NEXT_PUBLIC_COMPILER_URL || "api/compile";
 
@@ -68,16 +74,19 @@ export default function Home() {
       premintReceiver,
       premintQuantity,
       isMintable,
-      isBurnable,
+      isBurnable
     } = wizardOptions;
 
-    if (!premintQuantity) return message.error("Valid premint quantity is required");
-    if (premintReceiver && !isAddressValid(premintReceiver)) return message.error("Invalid premint receiver address");
+    if (!premintQuantity)
+      return message.error("Valid premint quantity is required");
+    if (premintReceiver && !isAddressValid(premintReceiver))
+      return message.error("Invalid premint receiver address");
 
+    const licenseIdentifierValue = licenseIdentifier || "UNLICENSED";
     const premintReceiverValue = premintReceiver || "msg.sender";
     const premintQuantityValue = `${premintQuantity} * 10 ** 18`;
     const contractCode = mainContract
-      .replace("$LICENSE_IDENTIFIER$", licenseIdentifier)
+      .replace("$LICENSE_IDENTIFIER$", licenseIdentifierValue)
       .replace("$SUPERTOKEN_BASE_IMPORT$", supertokenBaseImport)
       .replace("$OWNABLE_IMPORT$", isOwnable ? ownableImport : "")
       .replace("$OWNABLE_INHERITANCE$", isOwnable ? ", Ownable" : "")
@@ -85,7 +94,8 @@ export default function Home() {
       .replace("$PREMINT_QUANTITY$", premintQuantityValue)
       .replace("$MINT_FUNCTION$", isMintable ? mintFunction : "")
       .replace("$BURN_FUNCTION$", isBurnable ? burnFunction : "")
-      .replace("$ONLY_OWNER$", isOwnable ? "onlyOwner" : "");
+      .replace("$ONLY_OWNER$", isOwnable ? "onlyOwner" : "")
+      .replace(/(\n\s*){2,}/gm, "\n$1");
 
     setGeneratedCode(contractCode);
   };
@@ -98,7 +108,7 @@ export default function Home() {
 
   const handleConnectWallet = async () => {
     if (!window?.ethereum)
-      return message.warning(
+      return message.error(
         "Please install Metamask or any other web3 enabled browser"
       );
     setLoading({ connect: true });
@@ -115,11 +125,13 @@ export default function Home() {
       setSelectedChainId(
         selectedChain ? chainId?.toString() : "⚠ Unsupported chain"
       );
-      if (!selectedChain)
+      setAccount(account1);
+      if (!selectedChain) {
+        setLoading({ connect: false });
         return message.error(
           "Unsupported chain. Please switch to supported chain"
         );
-      setAccount(account1);
+      }
       setProvider(provider);
       message.success("Wallet connected");
       setLoading({ connect: false });
@@ -138,52 +150,50 @@ export default function Home() {
 
   const handleSwitchChain = async (selectedChainId) => {
     if (!window?.ethereum)
-      return message.warning(
+      return message.error(
         "Please install Metamask or any other web3 enabled browser"
       );
-    console.log("selectedChainId", selectedChainId);
+    console.log("Selected chainId:", selectedChainId);
     const selectedChain = chains[selectedChainId];
     if (!selectedChain) return message.error("Unsupported chain selected");
     setLoading({ switch: true });
     try {
-      await window.ethereum
-        .request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: selectedChain.chainId }]
-        })
-        .then(() => message.success(`Switched to ${selectedChain.chainName}`))
-        .catch(async (err) => {
-          console.log("err on switch", err);
-          // This error code indicates that the chain has not been added to MetaMask.
-          if (err.code === 4902) {
-            message.info(`Adding ${selectedChain.chainName} to metamask`);
-            await window.ethereum
-              .request({
-                method: "wallet_addEthereumChain",
-                params: [selectedChain]
-              })
-              .then(() =>
-                message.info(`Added ${selectedChain.chainName} to metamask`)
-              )
-              .catch((err) => {
-                message.error(
-                  `Failed to add ${selectedChain.chainName} to metamask`
-                );
-                console.error(err);
-              });
-          } else {
-            message.error(`Failed switching to ${selectedChain.chainName}`);
-          }
-        });
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: selectedChain.chainId }]
+      });
       const provider = new Web3Provider(window.ethereum);
       const { chainId } = await provider.getNetwork();
-      console.log("switched chainId:", chainId);
+      console.log("Switched chainId:", chainId);
       setProvider(provider);
-      setLoading({ switch: false });
+      message.success(`Switched to ${selectedChain.chainName}`);
     } catch (err) {
+      if (err.code === 4902) {
+        // This error code indicates that the chain has not been added to MetaMask.
+        message.info(`Adding ${selectedChain.chainName} to metamask`);
+        try {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [selectedChain]
+          });
+          const provider = new Web3Provider(window.ethereum);
+          const { chainId } = await provider.getNetwork();
+          console.log("switched chainId:", chainId);
+          if (chainId != selectedChainId)
+            return message.error(
+              `Failed switching to ${selectedChain.chainName}`
+            );
+          setProvider(provider);
+          message.success(`Switched to ${selectedChain.chainName}`);
+        } catch (err) {
+          console.error("Error adding chain:", err);
+          message.error(`Failed to add ${selectedChain.chainName} to metamask`);
+        }
+      } else {
+        message.error(`Failed switching to ${selectedChain.chainName}`);
+      }
+    } finally {
       setLoading({ switch: false });
-      console.log("err switching chain:", err);
-      message.error("Failed to switch chain!");
     }
   };
 
@@ -203,15 +213,10 @@ export default function Home() {
         },
         body: JSON.stringify({ code: codeForCompilation })
       });
-
-      if (!response.ok) {
-        setLoading({ compile: false });
-        return message.error("Something went wrong while compiling the code");
-      }
       const data = await response.json();
       if (data.code && data.message) {
         setLoading({ compile: false });
-        return message.error("Something went wrong while compiling the code");
+        return message.error(data.message);
       }
       setCompiledOutput(data);
       setLoading({ compile: false });
@@ -231,7 +236,8 @@ export default function Home() {
   };
 
   const handleDeploy = async () => {
-    if (!provider) return message.error("Please connect your wallet first");
+    if (!account || !provider)
+      return message.error("Please connect your wallet first");
     if (!compiledOutput?.abi?.length || !compiledOutput?.bytecode)
       return message.error("Please compile the code first");
     setLoading({ deploy: true });
@@ -258,7 +264,8 @@ export default function Home() {
   };
 
   const handleInitialize = async () => {
-    if (!provider) return message.error("Please connect your wallet first");
+    if (!account || !provider)
+      return message.error("Please connect your wallet first");
     if (!contract) return message.error("Please deploy the contract first");
     if (
       /^\s*$/.test(wizardOptions?.tokenName) ||
@@ -287,8 +294,19 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    handleGenerateCode();
+  }, [
+    wizardOptions.premintQuantity,
+    wizardOptions.premintReceiver,
+    wizardOptions.isMintable,
+    wizardOptions.isBurnable,
+    wizardOptions.isOwnable,
+    wizardOptions.licenseIdentifier
+  ]);
+
   return (
-    <>
+    <Layout style={{ minHeight: "100vh" }}>
       <div className={styles.navbar}>
         <div className={styles.logo}>
           <img
@@ -304,15 +322,35 @@ export default function Home() {
         </div>
         <div className={styles.navbarButtons}>
           {account ? (
-            <Button
-              type="secondary"
-              onClick={handleDisconnectWallet}
-              className={styles.actionsButton}
-            >
-              {account.slice(0, 8) + "..." + account.slice(-5)}
-            </Button>
+            <>
+              <Button
+                icon={<WalletOutlined />}
+                type="secondary"
+                onClick={handleDisconnectWallet}
+                className={styles.actionsButton}
+              >
+                {account.slice(0, 8) + "..." + account.slice(-5)}
+              </Button>
+              <Select
+                name="chainId"
+                id="chainId"
+                value={selectedChainId}
+                onChange={(value) => setSelectedChainId(value)}
+                onSelect={(value) => handleSwitchChain(value)}
+                style={{ width: 140 }}
+                className={styles.actionsButton}
+                loading={loading.switch}
+              >
+                {Object.keys(chains).map((chainId) => (
+                  <Select.Option key={chainId} value={chainId}>
+                    {chains[chainId]?.chainName?.split(" ")[0]}
+                  </Select.Option>
+                ))}
+              </Select>
+            </>
           ) : (
             <Button
+              icon={<WalletFilled />}
               type="secondary"
               onClick={handleConnectWallet}
               className={styles.actionsButton}
@@ -321,198 +359,217 @@ export default function Home() {
               Connect Wallet
             </Button>
           )}
-          <Select
-            name="chainId"
-            id="chainId"
-            value={selectedChainId}
-            onChange={(value) => setSelectedChainId(value)}
-            onSelect={(value) => handleSwitchChain(value)}
-            style={{ width: 120 }}
-            className={styles.actionsButton}
-            loading={loading.switch}
-          >
-            {Object.keys(chains).map((chainId) => (
-              <Select.Option key={chainId} value={chainId}>
-                {chains[chainId]?.chainName?.split(" ")[0]}
-              </Select.Option>
-            ))}
-          </Select>
         </div>
       </div>
-      <div className={styles.container}>
-        <div className={styles.options}>
-          <div className={styles.section}>
-            <h3>Token Options</h3>
-            <label htmlFor="tokenName">Name</label>
-            <Input
-              id="tokenName"
-              name="tokenName"
-              placeholder="Name"
-              value={wizardOptions?.tokenName}
-              onChange={handleWizardOptionsChange}
-            />
-            <label htmlFor="tokenSymbol">Symbol</label>
-            <Input
-              id="tokenSymbol"
-              name="tokenSymbol"
-              placeholder="Symbol"
-              value={wizardOptions?.tokenSymbol}
-              onChange={handleWizardOptionsChange}
-            />
-            <label htmlFor="premintQuantity">Premint Quantity</label>
-            <Input
-              id="premintQuantity"
-              name="premintQuantity"
-              type="number"
-              placeholder="Premint Quantity"
-              value={wizardOptions?.premintQuantity}
-              onChange={handleWizardOptionsChange}
-            />
-            <label htmlFor="premintReceiver">Premint Receiver</label>
-            <Input
-              id="premintReceiver"
-              name="premintReceiver"
-              type="text"
-              placeholder="Premint Receiver Address"
-              value={wizardOptions?.premintReceiver}
-              maxLength={42}
-              minLength={42}
-              onChange={handleWizardOptionsChange}
-            />
-          </div>
-          <div className={styles.section}>
-            <h3>Features</h3>
-            <Space direction="vertical">
-              <Checkbox
-                checked={wizardOptions?.isMintable}
-                onChange={(e) =>
-                  setWizardOptions({
-                    ...wizardOptions,
-                    isMintable: e.target.checked
-                  })
+      <Content style={{ minHeight: 300 }}>
+        <div className={styles.container}>
+          <div className={styles.options}>
+            <div className={styles.section}>
+              <h3>Token Options</h3>
+              <label htmlFor="tokenName">Name *</label>
+              <Input
+                id="tokenName"
+                name="tokenName"
+                placeholder="Name"
+                value={wizardOptions?.tokenName}
+                onChange={handleWizardOptionsChange}
+                maxLength={32}
+              />
+              <label htmlFor="tokenSymbol">Symbol *</label>
+              <Input
+                id="tokenSymbol"
+                name="tokenSymbol"
+                placeholder="Symbol"
+                value={wizardOptions?.tokenSymbol}
+                onChange={handleWizardOptionsChange}
+                maxLength={15}
+              />
+              <label htmlFor="premintQuantity">Premint Quantity *</label>
+              <Input
+                id="premintQuantity"
+                name="premintQuantity"
+                type="number"
+                placeholder="Premint Quantity"
+                value={wizardOptions?.premintQuantity}
+                onChange={handleWizardOptionsChange}
+                status={!wizardOptions?.premintQuantity ? "error" : ""}
+                min={1}
+                max={1000000000000}
+              />
+              <label htmlFor="premintReceiver">Premint Receiver</label>
+              <Input
+                id="premintReceiver"
+                name="premintReceiver"
+                type="text"
+                placeholder="Premint Receiver Address"
+                value={wizardOptions?.premintReceiver}
+                maxLength={42}
+                allowClear
+                status={
+                  wizardOptions?.premintReceiver &&
+                    !isAddressValid(wizardOptions?.premintReceiver)
+                    ? "error"
+                    : ""
                 }
-              >
-                Mintable
-              </Checkbox>
-              <Checkbox
-                checked={wizardOptions?.isBurnable}
-                onChange={(e) =>
-                  setWizardOptions({
-                    ...wizardOptions,
-                    isBurnable: e.target.checked
-                  })
-                }
-              >
-                Burnable
-              </Checkbox>
-              <Checkbox
-                checked={wizardOptions?.isOwnable}
-                onChange={(e) =>
-                  setWizardOptions({
-                    ...wizardOptions,
-                    isOwnable: e.target.checked
-                  })
-                }
-              >
-                Ownable
-              </Checkbox>
-            </Space>
-          </div>
-          <div className={styles.section}>
-            <h3>Miscellaneous</h3>
-            <label htmlFor="licenseIdentifier">License Identifier</label>
-            <Input
-              name="licenseIdentifier"
-              placeholder="License Identifier"
-              value={wizardOptions?.licenseIdentifier}
-              onChange={handleWizardOptionsChange}
-            />
-          </div>
-          <div className={styles.section}>
-            <Button type="primary" onClick={handleGenerateCode}>
-              Generate
-            </Button>
-          </div>
-        </div>
-        <div className={styles.code}>
-          <Input.TextArea
-            value={generatedCode}
-            autoSize={{ minRows: 10, maxRows: 80 }}
-            style={{
-              fontFamily: "monospace",
-              fontSize: "14px",
-              backgroundColor: "#282c34",
-              color: "#fff",
-              width: "100%",
-              height: "100%"
-            }}
-            readOnly
-            spellCheck="false"
-            autoCapitalize="off"
-            autoComplete="off"
-            autoCorrect="off"
-            rows={20}
-            cols={80}
-          />
-          <div className={styles.codeButtons}>
-            <Button onClick={handleCopyCode} disabled={!generatedCode}>
-              Copy Code
-            </Button>
-            <Link
-              href={`https://remix.ethereum.org/?#code=${btoa(generatedCode)}`}
-              target="_blank"
-            >
-              <Button disabled={!generatedCode}>Open in Remix</Button>
-            </Link>
-            <Button
-              type="primary"
-              onClick={handleCompile}
-              disabled={!generatedCode || loading.compile}
-              loading={loading.compile}
-            >
-              Compile
-            </Button>
-
-            <Button
-              type="primary"
-              onClick={handleCopyArtifacts}
-              disabled={!compiledOutput?.bytecode}
-            >
-              Copy Artifacts
-            </Button>
-            <Button
-              type="primary"
-              onClick={handleDeploy}
-              disabled={!compiledOutput?.bytecode || loading.deploy}
-              loading={loading.deploy}
-            >
-              Deploy
-            </Button>
-            <Button
-              type="primary"
-              disabled={!contract || loading.initialize}
-              onClick={handleInitialize}
-              loading={loading.initialize}
-            >
-              Initialize
-            </Button>
-          </div>
-          {logMessage && (
-            <div className={styles.logBox}>
-              <p>{logMessage}</p>
+                onChange={handleWizardOptionsChange}
+              />
             </div>
-          )}
+            <div className={styles.section}>
+              <h3>Features</h3>
+              <Space direction="vertical">
+                <Checkbox
+                  id="isMintable"
+                  checked={wizardOptions?.isMintable}
+                  onChange={(e) =>
+                    setWizardOptions({
+                      ...wizardOptions,
+                      isMintable: e.target.checked
+                    })
+                  }
+                >
+                  Mintable
+                </Checkbox>
+                <Checkbox
+                  id="isBurnable"
+                  checked={wizardOptions?.isBurnable}
+                  onChange={(e) =>
+                    setWizardOptions({
+                      ...wizardOptions,
+                      isBurnable: e.target.checked
+                    })
+                  }
+                >
+                  Burnable
+                </Checkbox>
+                <Checkbox
+                  id="isOwnable"
+                  checked={wizardOptions?.isOwnable}
+                  onChange={(e) =>
+                    setWizardOptions({
+                      ...wizardOptions,
+                      isOwnable: e.target.checked
+                    })
+                  }
+                >
+                  Ownable
+                </Checkbox>
+              </Space>
+            </div>
+            <div className={styles.section}>
+              <h3>Miscellaneous</h3>
+              <label htmlFor="licenseIdentifier">License Identifier</label>
+              <Input
+                id="licenseIdentifier"
+                name="licenseIdentifier"
+                placeholder="License Identifier"
+                value={wizardOptions?.licenseIdentifier}
+                onChange={handleWizardOptionsChange}
+                maxLength={32}
+              />
+            </div>
+          </div>
+          <div className={styles.code}>
+            <div className={styles.codeHeader}>
+              <Button
+                icon={<CopyOutlined />}
+                onClick={handleCopyCode}
+                disabled={!generatedCode}
+                title="Copy Code"
+              />
+              <Link
+                href={`https://remix.ethereum.org/?#code=${btoa(
+                  generatedCode
+                )}`}
+                target="_blank"
+              >
+                <Button
+                  disabled={!generatedCode}
+                  title="Open in Remix"
+                  icon={
+                    <img
+                      src="/remix_logo.svg"
+                      alt="remix-logo"
+                      className={styles.remixLogo}
+                    />
+                  }
+                />
+              </Link>
+            </div>
+            <Input.TextArea
+              id="generatedCode"
+              value={generatedCode}
+              style={{
+                fontFamily: "monospace",
+                fontSize: "14px",
+                backgroundColor: "#1f2430",
+                color: "#fff",
+                width: "100%",
+                height: "100%",
+                whiteSpace: "pre"
+              }}
+              readOnly
+              spellCheck="false"
+              autoCapitalize="off"
+              autoComplete="off"
+              autoCorrect="off"
+              rows={25}
+              cols={90}
+            />
+            <div className={styles.codeButtons}>
+              <Button
+                type="primary"
+                icon={<SendOutlined />}
+                onClick={handleCompile}
+                disabled={!generatedCode || loading.compile}
+                loading={loading.compile}
+              >
+                Compile
+              </Button>
+
+              <Button
+                icon={<CopyOutlined />}
+                onClick={handleCopyArtifacts}
+                disabled={!compiledOutput?.bytecode}
+                title="Copy Artifacts"
+              >
+                Artifacts
+              </Button>
+              <Button
+                type="primary"
+                icon={<ThunderboltOutlined />}
+                onClick={handleDeploy}
+                disabled={!compiledOutput?.bytecode || loading.deploy}
+                loading={loading.deploy}
+              >
+                Deploy
+              </Button>
+              <Button
+                type="primary"
+                icon={<LinkOutlined />}
+                disabled={!contract || loading.initialize}
+                onClick={handleInitialize}
+                loading={loading.initialize}
+              >
+                Initialize
+              </Button>
+            </div>
+            {logMessage && (
+              <div className={styles.logBox}>
+                <p>{logMessage}</p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-      <Layout.Footer style={{ textAlign: "center" }}>
+      </Content>
+      <Footer style={{ textAlign: "center" }}>
         <a
           href="https://github.com/Salmandabbakuti"
           target="_blank"
           rel="noopener noreferrer"
         >
-          © {new Date().getFullYear()} Salman Dabbakuti. Powered by Nextjs
+          Made with ❤️ by Salman Dabbakuti. Powered by Nextjs & Ant Design
         </a>
-      </Layout.Footer>
-    </>
+      </Footer>
+    </Layout>
   );
 }

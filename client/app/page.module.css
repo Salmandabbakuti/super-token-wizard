@@ -1,12 +1,12 @@
 .navbar {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px;
-  background-color: #f5f5f5;
+  padding: 15px;
+  background-color: #f0f0f0;
 }
 
 .logo {
@@ -20,26 +20,31 @@
   margin-right: 10px;
 }
 
+.remixLogo {
+  width: 15px;
+  height: 15px;
+}
+
 .logoText {
   font-size: 18px;
 }
 
 .navbarButtons {
   display: flex;
-  gap: 10px;
+  gap: 5px;
 }
 
 .container {
   display: flex;
   flex-wrap: wrap;
   border: 1px solid #ccc;
-  background-color: #f6f8f9
+  background-color: #f6f8f9;
 }
 
 .options {
   flex: 1 0 100%;
   padding: 20px;
-  background-color: #ffffff;
+  background-color: #fff;
 }
 
 .section {
@@ -49,8 +54,17 @@
 
 .code {
   flex: 1;
-  padding: 20px;
+  padding: 8px;
   height: max-content;
+}
+
+.codeHeader {
+  position: relative;
+  float: right;
+  display: flex;
+  gap: 5px;
+  z-index: 1;
+  margin: 5px 5px -40px 0;
 }
 
 .codeButtons {
