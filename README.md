@@ -2,17 +2,15 @@
 
 The SuperToken Wizard is a web-based interface that allows developers or individuals to easily deploy a Super Token contract without the need for manually searching for the right contracts and parameters or configuring them individually. With this wizard, you can quickly generate a customized Super Token contract based on your specific needs, copy it or open in remix directly for further customization and deployment, Wizard also allow you to deploy and initialize Super Token contract right from the app. You can also switch between different blockchain networks with in the wizard to deploy Super Tokens on your preferred network.
 
-![Screen1](https://github.com/Salmandabbakuti/superfluid-devmode-dashboard/assets/29351207/8c7f3a71-eaa7-4b87-854b-ce979876058a)
+![Screen1](https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/30899cb0-29ab-4c33-b8d1-4b754150c08a)
 
-![Screen2](https://github.com/Salmandabbakuti/superfluid-devmode-dashboard/assets/29351207/df4697ef-eb2e-4a64-a26c-1776839e7d0f)
-
-![Screen3](https://github.com/Salmandabbakuti/superfluid-devmode-dashboard/assets/29351207/ec07764b-86f8-4424-bb5e-70c8425cfbdb)
+![Screen2](https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/53aaf3b4-4972-4b69-9409-3cabb04b610f)
 
 ## Features
 
 **1. Connect Wallet and Switch Networks:** The wizard allows you to connect your wallet and switch between different blockchain networks, enabling you to deploy Super Tokens on your preferred network.
 
-**2. Customizable Contract Generation:** You can input parameters such as token name, token symbol, premint quantity, and premint receiver address to generate customized contract code for your Super Token. Additionally, you can enable or disable features like mintable, ownable and burnable for the token.
+**2. Customizable Contract Generation:** You can input parameters such as token name, token symbol, premint quantity, and premint receiver address to generate a customized contract code for your Super Token. Additionally, you can enable or disable features like mintable, ownable, and burnable for the token.
 
 **3. Copy and Open in Remix:** The generated contract code can be easily copied or opened in Remix IDE directly for further customization and deployment.
 
@@ -61,6 +59,8 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ### Demo
+
+https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/3784a598-ae2f-4557-905a-7425c336e853
 
 ## Credits & Resources:
 
