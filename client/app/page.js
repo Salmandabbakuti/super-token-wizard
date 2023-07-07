@@ -194,6 +194,11 @@ export default function Home() {
         message.error(`Failed switching to ${selectedChain.chainName}`);
       }
     } finally {
+      const provider = new Web3Provider(window.ethereum);
+      const { chainId: currentChainId } = await provider.getNetwork();
+      setSelectedChainId(
+        chains[currentChainId] ? currentChainId?.toString() : "⚠ Unsupported chain"
+      );
       setLoading({ switch: false });
     }
   };
