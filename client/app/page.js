@@ -12,7 +12,8 @@ import {
   message,
   Select,
   Space,
-  Layout
+  Layout,
+  Radio
 } from "antd";
 import {
   CopyOutlined,
@@ -26,12 +27,20 @@ import styles from "./page.module.css";
 import "antd/dist/antd.css";
 
 import {
-  mainContract,
+  baseContract,
   supertokenBaseImport,
   supertokenBaseImportLocalPath,
   ownableImport,
   mintFunction,
-  burnFunction
+  burnFunction,
+  accessControlImport,
+  roleDefBlock,
+  mintFunctionWithRole,
+  burnFunctionWithRole,
+  minterRoleDef,
+  burnerRoleDef,
+  minterRoleSetup,
+  burnerRoleSetup
 } from "./utils/contractTemplates";
 
 import { superTokenFactoryAddresses, chains, isAddressValid } from "./utils";
@@ -45,7 +54,8 @@ export default function Home() {
     premintQuantity: 1000,
     licenseIdentifier: "MIT",
     tokenName: "",
-    tokenSymbol: ""
+    tokenSymbol: "",
+    accessControl: ""
   });
   const [generatedCode, setGeneratedCode] = useState("");
   const [compiledOutput, setCompiledOutput] = useState(null);
@@ -71,11 +81,11 @@ export default function Home() {
     setContract(null);
     const {
       licenseIdentifier,
-      isOwnable,
       premintReceiver,
       premintQuantity,
       isMintable,
-      isBurnable
+      isBurnable,
+      accessControl
     } = wizardOptions;
 
     if (!premintQuantity)
@@ -83,19 +93,45 @@ export default function Home() {
     if (premintReceiver && !isAddressValid(premintReceiver))
       return message.error("Invalid premint receiver address");
 
+    // Determine the mint and burn functions based on user selections using ternary operators
+    const mintFunctionValue = accessControl === "roles"
+      ? mintFunctionWithRole
+      : mintFunction;
+
+    const burnFunctionValue = accessControl === "roles"
+      ? burnFunctionWithRole
+      : burnFunction;
+
+    const accessControlImportValue = accessControl === "roles"
+      ? accessControlImport
+      : ownableImport;
+
+    const accessControlInheritanceValue = accessControl === "roles"
+      ? ", AccessControl"
+      : ", Ownable";
+
+    const roleDefBlockValue =
+      accessControl === "roles"
+        ? roleDefBlock
+          .replace("$MINTER_ROLE_DEF$", isMintable ? minterRoleDef : "")
+          .replace("$BURNER_ROLE_DEF$", isBurnable ? burnerRoleDef : "")
+          .replace("$MINTER_ROLE_SETUP$", isMintable ? minterRoleSetup : "")
+          .replace("$BURNER_ROLE_SETUP$", isBurnable ? burnerRoleSetup : "")
+        : "";
     const licenseIdentifierValue = licenseIdentifier || "UNLICENSED";
     const premintReceiverValue = premintReceiver || "msg.sender";
     const premintQuantityValue = `${premintQuantity} * 10 ** 18`;
-    const contractCode = mainContract
+    const contractCode = baseContract
       .replace("$LICENSE_IDENTIFIER$", licenseIdentifierValue)
       .replace("$SUPERTOKEN_BASE_IMPORT$", supertokenBaseImport)
-      .replace("$OWNABLE_IMPORT$", isOwnable ? ownableImport : "")
-      .replace("$OWNABLE_INHERITANCE$", isOwnable ? ", Ownable" : "")
+      .replace("$ACCESS_CONTROL_IMPORT$", accessControl ? accessControlImportValue : "")
+      .replace("$ACCESS_CONTROL_INHERITANCE$", accessControl ? accessControlInheritanceValue : "")
+      .replace("$ROLE_DEF_BLOCK$", roleDefBlockValue)
       .replace("$PREMINT_RECEIVER$", premintReceiverValue)
       .replace("$PREMINT_QUANTITY$", premintQuantityValue)
-      .replace("$MINT_FUNCTION$", isMintable ? mintFunction : "")
-      .replace("$BURN_FUNCTION$", isBurnable ? burnFunction : "")
-      .replace("$ONLY_OWNER$", isOwnable ? "onlyOwner" : "")
+      .replace("$MINT_FUNCTION$", isMintable ? mintFunctionValue : "")
+      .replace("$BURN_FUNCTION$", isBurnable ? burnFunctionValue : "")
+      .replace("$ONLY_OWNER$", accessControl === "ownable" ? "onlyOwner" : "")
       .replace(/(\n\s*){2,}/gm, "\n$1");
 
     setGeneratedCode(contractCode);
@@ -197,7 +233,9 @@ export default function Home() {
       const provider = new Web3Provider(window.ethereum);
       const { chainId: currentChainId } = await provider.getNetwork();
       setSelectedChainId(
-        chains[currentChainId] ? currentChainId?.toString() : "⚠ Unsupported chain"
+        chains[currentChainId]
+          ? currentChainId?.toString()
+          : "⚠ Unsupported chain"
       );
       setLoading({ switch: false });
     }
@@ -308,7 +346,8 @@ export default function Home() {
     wizardOptions.isMintable,
     wizardOptions.isBurnable,
     wizardOptions.isOwnable,
-    wizardOptions.licenseIdentifier
+    wizardOptions.licenseIdentifier,
+    wizardOptions.accessControl
   ]);
 
   return (
@@ -447,19 +486,30 @@ export default function Home() {
                 >
                   Burnable
                 </Checkbox>
-                <Checkbox
-                  id="isOwnable"
-                  checked={wizardOptions?.isOwnable}
-                  onChange={(e) =>
-                    setWizardOptions({
-                      ...wizardOptions,
-                      isOwnable: e.target.checked
-                    })
-                  }
-                >
-                  Ownable
-                </Checkbox>
               </Space>
+            </div>
+            <div className={styles.section}>
+              <h3>Access Control</h3>
+              <Radio.Group
+                id="accessControl"
+                name="accessControl"
+                value={wizardOptions?.accessControl}
+                buttonStyle="solid"
+                size="small"
+                options={
+                  [
+                    { label: "None", value: "" },
+                    { label: "Ownable", value: "ownable" },
+                    { label: "Roles", value: "roles" }
+                  ]
+                }
+                onChange={(e) =>
+                  setWizardOptions({
+                    ...wizardOptions,
+                    accessControl: e.target.value
+                  })
+                }
+              />
             </div>
             <div className={styles.section}>
               <h3>Miscellaneous</h3>
