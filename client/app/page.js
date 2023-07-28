@@ -93,7 +93,7 @@ export default function Home() {
     if (premintReceiver && !isAddressValid(premintReceiver))
       return message.error("Invalid premint receiver address");
 
-    // Determine the mint and burn functions based on user selections using ternary operators
+    // Determine the mint and burn functions based on user acl choice
     const mintFunctionValue = accessControl === "roles"
       ? mintFunctionWithRole
       : mintFunction;
@@ -571,7 +571,7 @@ export default function Home() {
               autoComplete="off"
               autoCorrect="off"
               rows={25}
-              cols={90}
+              cols={100}
             />
             <div className={styles.codeButtons}>
               <Button

@@ -20,8 +20,9 @@ export const chains = {
       decimals: 18
     },
     rpcUrls: [
+      "https://rpc-mumbai.maticvigil.com",
+      "https://rpc.ankr.com/polygon_mumbai",
       "https://matic-mumbai.chainstacklabs.com",
-      "https://rpc-mumbai.maticvigil.com"
     ],
     blockExplorerUrls: ["https://mumbai.polygonscan.com"]
   },
