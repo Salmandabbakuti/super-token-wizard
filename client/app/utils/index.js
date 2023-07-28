@@ -1,5 +1,23 @@
 import { getAddress } from "@ethersproject/address";
 
+import {
+  baseContract,
+  supertokenBaseImport,
+  ownableImport,
+  mintFunction,
+  burnFunction,
+  accessControlImport,
+  cappedSupplyDefBlock,
+  maxSupplyCheck,
+  roleDefBlock,
+  mintFunctionWithRole,
+  burnFunctionWithRole,
+  minterRoleDef,
+  burnerRoleDef,
+  minterRoleSetup,
+  burnerRoleSetup
+} from "./contractTemplates";
+
 export const superTokenFactoryAddresses = {
   80001: "0xb798553db6eb3d3c56912378409370145e97324b",
   137: "0x2C90719f25B10Fc5646c82DA3240C76Fa5BcCF34",
@@ -22,7 +40,7 @@ export const chains = {
     rpcUrls: [
       "https://rpc-mumbai.maticvigil.com",
       "https://rpc.ankr.com/polygon_mumbai",
-      "https://matic-mumbai.chainstacklabs.com",
+      "https://matic-mumbai.chainstacklabs.com"
     ],
     blockExplorerUrls: ["https://mumbai.polygonscan.com"]
   },
@@ -91,3 +109,61 @@ export const isAddressValid = (address) => {
     return false;
   }
 };
+
+export const generateCode = (wizardOptions) => {
+  const {
+    licenseIdentifier = "UNLICENSED",
+    premintReceiver = "msg.sender",
+    premintQuantity,
+    maxSupply,
+    isMintable,
+    isBurnable,
+    isCappedSupply,
+    accessControl,
+  } = wizardOptions;
+
+  const premintQuantityValue = `${premintQuantity} * 10 ** 18`;
+
+  const hasRolesAccessControl = accessControl === "roles";
+  const roleDefBlockValue = hasRolesAccessControl
+    ? roleDefBlock
+      .replace("$MINTER_ROLE_DEF$", isMintable ? minterRoleDef : "")
+      .replace("$BURNER_ROLE_DEF$", isBurnable ? burnerRoleDef : "")
+      .replace("$MINTER_ROLE_SETUP$", isMintable ? minterRoleSetup : "-")
+      .replace("$BURNER_ROLE_SETUP$", isBurnable ? burnerRoleSetup : "-")
+    : "";
+
+  const maxSupplyAssignDef = isCappedSupply ? `maxSupply = ${maxSupply};` : "-";
+
+  // Determine the mint and burn functions based on user acl choice
+  const mintFunctionValue = hasRolesAccessControl ? mintFunctionWithRole : mintFunction;
+  const burnFunctionValue = hasRolesAccessControl ? burnFunctionWithRole : burnFunction;
+
+  const accessControlImportValue = hasRolesAccessControl ? accessControlImport : ownableImport;
+  const accessControlInheritanceValue = hasRolesAccessControl ? ", AccessControl" : ", Ownable";
+
+  const contractCode = baseContract
+    .replace("$LICENSE_IDENTIFIER$", licenseIdentifier)
+    .replace("$SUPERTOKEN_BASE_IMPORT$", supertokenBaseImport)
+    .replace("$ACCESS_CONTROL_IMPORT$", accessControl ? accessControlImportValue : "")
+    .replace("$ACCESS_CONTROL_INHERITANCE$", accessControl ? accessControlInheritanceValue : "")
+    .replace("$CAPPED_SUPPLY_DEF_BLOCK$", isCappedSupply ? cappedSupplyDefBlock : "")
+    .replace("$ROLE_DEF_BLOCK$", roleDefBlockValue)
+    .replace("$MAX_SUPPLY_ASSIGN_DEF$", maxSupplyAssignDef)
+    .replace("$PREMINT_RECEIVER$", premintReceiver)
+    .replace("$PREMINT_QUANTITY$", premintQuantityValue)
+    .replace("$MINT_FUNCTION$", isMintable ? mintFunctionValue : "")
+    .replace("$MAX_SUPPLY_CHECK$", isCappedSupply ? maxSupplyCheck : "-")
+    .replace("$BURN_FUNCTION$", isBurnable ? burnFunctionValue : "")
+    .replace("$ONLY_OWNER$", accessControl === "ownable" ? "onlyOwner" : "")
+    .replace(/(\n\s*){2,}/gm, "\n$1"); // replace multiple empty lines with a single empty line to preserve indentation
+
+  // Remove "-" placeholders(used to preserve indentation) and empty lines
+  const generatedCode = contractCode
+    .split("\n")
+    .filter((line) => line.trim() !== "-")
+    .join("\n");
+
+  return generatedCode;
+};
+

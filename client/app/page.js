@@ -27,25 +27,16 @@ import styles from "./page.module.css";
 import "antd/dist/antd.css";
 
 import {
-  baseContract,
   supertokenBaseImport,
-  supertokenBaseImportLocalPath,
-  ownableImport,
-  mintFunction,
-  burnFunction,
-  accessControlImport,
-  cappedSupplyDefBlock,
-  maxSupplyCheck,
-  roleDefBlock,
-  mintFunctionWithRole,
-  burnFunctionWithRole,
-  minterRoleDef,
-  burnerRoleDef,
-  minterRoleSetup,
-  burnerRoleSetup
+  supertokenBaseImportLocalPath
 } from "./utils/contractTemplates";
 
-import { superTokenFactoryAddresses, chains, isAddressValid } from "./utils";
+import {
+  superTokenFactoryAddresses,
+  chains,
+  isAddressValid,
+  generateCode
+} from "./utils";
 
 const { Content, Footer } = Layout;
 
@@ -82,69 +73,18 @@ export default function Home() {
   const handleGenerateCode = () => {
     setCompiledOutput(null);
     setContract(null);
-    const {
-      licenseIdentifier,
-      premintReceiver,
-      premintQuantity,
-      maxSupply,
-      isMintable,
-      isBurnable,
-      isCappedSupply,
-      accessControl
-    } = wizardOptions;
+    const { premintReceiver, premintQuantity, maxSupply, isCappedSupply } =
+      wizardOptions;
 
     if (!premintQuantity)
       return message.error("Valid premint quantity is required");
-    if (isCappedSupply && !maxSupply) return message.error("Max supply is required");
+    if (isCappedSupply && !maxSupply)
+      return message.error("Max supply is required");
     if (premintReceiver && !isAddressValid(premintReceiver))
       return message.error("Invalid premint receiver address");
 
-    // Determine the mint and burn functions based on user acl choice
-    const mintFunctionValue = accessControl === "roles"
-      ? mintFunctionWithRole
-      : mintFunction;
-
-    const burnFunctionValue = accessControl === "roles"
-      ? burnFunctionWithRole
-      : burnFunction;
-
-    const accessControlImportValue = accessControl === "roles"
-      ? accessControlImport
-      : ownableImport;
-
-    const accessControlInheritanceValue = accessControl === "roles"
-      ? ", AccessControl"
-      : ", Ownable";
-
-    const roleDefBlockValue =
-      accessControl === "roles"
-        ? roleDefBlock
-          .replace("$MINTER_ROLE_DEF$", isMintable ? minterRoleDef : "")
-          .replace("$BURNER_ROLE_DEF$", isBurnable ? burnerRoleDef : "")
-          .replace("$MINTER_ROLE_SETUP$", isMintable ? minterRoleSetup : "")
-          .replace("$BURNER_ROLE_SETUP$", isBurnable ? burnerRoleSetup : "")
-        : "";
-    const licenseIdentifierValue = licenseIdentifier || "UNLICENSED";
-    const premintReceiverValue = premintReceiver || "msg.sender";
-    const premintQuantityValue = `${premintQuantity} * 10 ** 18`;
-    const maxSupplyAssignDef = isCappedSupply ? `maxSupply = ${maxSupply};` : "";
-    const contractCode = baseContract
-      .replace("$LICENSE_IDENTIFIER$", licenseIdentifierValue)
-      .replace("$SUPERTOKEN_BASE_IMPORT$", supertokenBaseImport)
-      .replace("$ACCESS_CONTROL_IMPORT$", accessControl ? accessControlImportValue : "")
-      .replace("$ACCESS_CONTROL_INHERITANCE$", accessControl ? accessControlInheritanceValue : "")
-      .replace("$CAPPED_SUPPLY_DEF_BLOCK$", isCappedSupply ? cappedSupplyDefBlock : "")
-      .replace("$ROLE_DEF_BLOCK$", roleDefBlockValue)
-      .replace("$MAX_SUPPLY_ASSIGN_DEF$", maxSupplyAssignDef)
-      .replace("$PREMINT_RECEIVER$", premintReceiverValue)
-      .replace("$PREMINT_QUANTITY$", premintQuantityValue)
-      .replace("$MINT_FUNCTION$", isMintable ? mintFunctionValue : "")
-      .replace("$MAX_SUPPLY_CHECK$", isCappedSupply ? maxSupplyCheck : "")
-      .replace("$BURN_FUNCTION$", isBurnable ? burnFunctionValue : "")
-      .replace("$ONLY_OWNER$", accessControl === "ownable" ? "onlyOwner" : "")
-      .replace(/(\n\s*){2,}/gm, "\n$1");
-
-    setGeneratedCode(contractCode);
+    const generatedCode = generateCode(wizardOptions);
+    setGeneratedCode(generatedCode);
   };
 
   const handleCopyCode = () => {
@@ -469,24 +409,22 @@ export default function Home() {
                 }
                 onChange={handleWizardOptionsChange}
               />
-              {
-                wizardOptions?.isCappedSupply && (
-                  <>
-                    <label htmlFor="maxSupply">Max Supply *</label>
-                    <Input
-                      id="maxSupply"
-                      name="maxSupply"
-                      type="number"
-                      placeholder="Max Supply"
-                      value={wizardOptions?.maxSupply}
-                      onChange={handleWizardOptionsChange}
-                      status={!wizardOptions?.maxSupply ? "error" : ""}
-                      min={1}
-                      max={1000000000000}
-                    />
-                  </>
-                )
-              }
+              {wizardOptions?.isCappedSupply && (
+                <>
+                  <label htmlFor="maxSupply">Max Supply *</label>
+                  <Input
+                    id="maxSupply"
+                    name="maxSupply"
+                    type="number"
+                    placeholder="Max Supply"
+                    value={wizardOptions?.maxSupply}
+                    onChange={handleWizardOptionsChange}
+                    status={!wizardOptions?.maxSupply ? "error" : ""}
+                    min={1}
+                    max={1000000000000}
+                  />
+                </>
+              )}
             </div>
             <div className={styles.section}>
               <h3>Features</h3>
@@ -537,13 +475,11 @@ export default function Home() {
                 value={wizardOptions?.accessControl}
                 buttonStyle="solid"
                 size="small"
-                options={
-                  [
-                    { label: "None", value: "" },
-                    { label: "Ownable", value: "ownable" },
-                    { label: "Roles", value: "roles" }
-                  ]
-                }
+                options={[
+                  { label: "None", value: "" },
+                  { label: "Ownable", value: "ownable" },
+                  { label: "Roles", value: "roles" }
+                ]}
                 onChange={(e) =>
                   setWizardOptions({
                     ...wizardOptions,
@@ -669,6 +605,6 @@ export default function Home() {
           Made with ❤️ by Salman Dabbakuti. Powered by Nextjs & Ant Design
         </a>
       </Footer>
-    </Layout >
+    </Layout>
   );
 }
