@@ -34,6 +34,8 @@ import {
   mintFunction,
   burnFunction,
   accessControlImport,
+  cappedSupplyDefBlock,
+  maxSupplyCheck,
   roleDefBlock,
   mintFunctionWithRole,
   burnFunctionWithRole,
@@ -52,6 +54,7 @@ const compilerUrl = process.env.NEXT_PUBLIC_COMPILER_URL || "api/compile";
 export default function Home() {
   const [wizardOptions, setWizardOptions] = useState({
     premintQuantity: 1000,
+    maxSupply: 1000000,
     licenseIdentifier: "MIT",
     tokenName: "",
     tokenSymbol: "",
@@ -83,13 +86,16 @@ export default function Home() {
       licenseIdentifier,
       premintReceiver,
       premintQuantity,
+      maxSupply,
       isMintable,
       isBurnable,
+      isCappedSupply,
       accessControl
     } = wizardOptions;
 
     if (!premintQuantity)
       return message.error("Valid premint quantity is required");
+    if (isCappedSupply && !maxSupply) return message.error("Max supply is required");
     if (premintReceiver && !isAddressValid(premintReceiver))
       return message.error("Invalid premint receiver address");
 
@@ -121,15 +127,19 @@ export default function Home() {
     const licenseIdentifierValue = licenseIdentifier || "UNLICENSED";
     const premintReceiverValue = premintReceiver || "msg.sender";
     const premintQuantityValue = `${premintQuantity} * 10 ** 18`;
+    const maxSupplyAssignDef = isCappedSupply ? `maxSupply = ${maxSupply};` : "";
     const contractCode = baseContract
       .replace("$LICENSE_IDENTIFIER$", licenseIdentifierValue)
       .replace("$SUPERTOKEN_BASE_IMPORT$", supertokenBaseImport)
       .replace("$ACCESS_CONTROL_IMPORT$", accessControl ? accessControlImportValue : "")
       .replace("$ACCESS_CONTROL_INHERITANCE$", accessControl ? accessControlInheritanceValue : "")
+      .replace("$CAPPED_SUPPLY_DEF_BLOCK$", isCappedSupply ? cappedSupplyDefBlock : "")
       .replace("$ROLE_DEF_BLOCK$", roleDefBlockValue)
+      .replace("$MAX_SUPPLY_ASSIGN_DEF$", maxSupplyAssignDef)
       .replace("$PREMINT_RECEIVER$", premintReceiverValue)
       .replace("$PREMINT_QUANTITY$", premintQuantityValue)
       .replace("$MINT_FUNCTION$", isMintable ? mintFunctionValue : "")
+      .replace("$MAX_SUPPLY_CHECK$", isCappedSupply ? maxSupplyCheck : "")
       .replace("$BURN_FUNCTION$", isBurnable ? burnFunctionValue : "")
       .replace("$ONLY_OWNER$", accessControl === "ownable" ? "onlyOwner" : "")
       .replace(/(\n\s*){2,}/gm, "\n$1");
@@ -342,10 +352,11 @@ export default function Home() {
     handleGenerateCode();
   }, [
     wizardOptions.premintQuantity,
+    wizardOptions.maxSupply,
     wizardOptions.premintReceiver,
     wizardOptions.isMintable,
     wizardOptions.isBurnable,
-    wizardOptions.isOwnable,
+    wizardOptions.isCappedSupply,
     wizardOptions.licenseIdentifier,
     wizardOptions.accessControl
   ]);
@@ -458,6 +469,24 @@ export default function Home() {
                 }
                 onChange={handleWizardOptionsChange}
               />
+              {
+                wizardOptions?.isCappedSupply && (
+                  <>
+                    <label htmlFor="maxSupply">Max Supply *</label>
+                    <Input
+                      id="maxSupply"
+                      name="maxSupply"
+                      type="number"
+                      placeholder="Max Supply"
+                      value={wizardOptions?.maxSupply}
+                      onChange={handleWizardOptionsChange}
+                      status={!wizardOptions?.maxSupply ? "error" : ""}
+                      min={1}
+                      max={1000000000000}
+                    />
+                  </>
+                )
+              }
             </div>
             <div className={styles.section}>
               <h3>Features</h3>
@@ -485,6 +514,18 @@ export default function Home() {
                   }
                 >
                   Burnable
+                </Checkbox>
+                <Checkbox
+                  id="isBurnable"
+                  checked={wizardOptions?.isCappedSupply}
+                  onChange={(e) =>
+                    setWizardOptions({
+                      ...wizardOptions,
+                      isCappedSupply: e.target.checked
+                    })
+                  }
+                >
+                  Capped Supply
                 </Checkbox>
               </Space>
             </div>
@@ -628,6 +669,6 @@ export default function Home() {
           Made with ❤️ by Salman Dabbakuti. Powered by Nextjs & Ant Design
         </a>
       </Footer>
-    </Layout>
+    </Layout >
   );
 }
