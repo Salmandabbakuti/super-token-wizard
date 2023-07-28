@@ -44,7 +44,8 @@ export const roleDefBlock = `$MINTER_ROLE_DEF$
 	}`;
 
 export const cappedSupplyDefBlock = `error SupplyCapped();
-        uint256 public maxSupply;`;
+	uint256 public maxSupply;
+`;
 
 export const maxSupplyCheck = `if (_totalSupply() + amount > maxSupply) revert SupplyCapped();`;
 

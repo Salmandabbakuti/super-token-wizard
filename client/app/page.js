@@ -454,7 +454,7 @@ export default function Home() {
                   Burnable
                 </Checkbox>
                 <Checkbox
-                  id="isBurnable"
+                  id="isCappedSupply"
                   checked={wizardOptions?.isCappedSupply}
                   onChange={(e) =>
                     setWizardOptions({
@@ -535,7 +535,7 @@ export default function Home() {
               value={generatedCode}
               style={{
                 fontFamily: "monospace",
-                fontSize: "14px",
+                fontSize: "13px",
                 backgroundColor: "#1f2430",
                 color: "#fff",
                 width: "100%",
@@ -547,8 +547,8 @@ export default function Home() {
               autoCapitalize="off"
               autoComplete="off"
               autoCorrect="off"
-              rows={25}
-              cols={100}
+              rows={30}
+              cols={90}
             />
             <div className={styles.codeButtons}>
               <Button
