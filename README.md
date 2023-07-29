@@ -2,7 +2,7 @@
 
 The SuperToken Wizard is a web-based interface that allows developers or individuals to easily deploy a Super Token contract without the need for manually searching for the right contracts and parameters or configuring them individually. With this wizard, you can quickly generate a customized Super Token contract based on your specific needs, copy it or open in remix directly for further customization and deployment, Wizard also allow you to deploy and initialize Super Token contract right from the app. You can also switch between different blockchain networks with in the wizard to deploy Super Tokens on your preferred network.
 
-![Screen1](https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/6092aad0-fb29-4f2c-981f-1da56df22d4f)
+![Screen1](https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/3ee036eb-3868-4b6a-af2c-f15d7bfe745d)
 
 ![Screen2](https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/95c61074-9a7b-4bbb-beb2-6d2c5eacaf42)
 
@@ -60,7 +60,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Demo
 
-https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/3784a598-ae2f-4557-905a-7425c336e853
+https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/4645190e-dd75-400b-8e85-7f5dae9b2c36
 
 ## Credits & Resources:
 

@@ -14,8 +14,8 @@ import {
   burnFunctionWithRole,
   minterRoleDef,
   burnerRoleDef,
-  minterRoleSetup,
-  burnerRoleSetup
+  minterRoleGrant,
+  burnerRoleGrant,
 } from "./contractTemplates";
 
 export const superTokenFactoryAddresses = {
@@ -129,8 +129,8 @@ export const generateCode = (wizardOptions) => {
     ? roleDefBlock
       .replace("$MINTER_ROLE_DEF$", isMintable ? minterRoleDef : "")
       .replace("$BURNER_ROLE_DEF$", isBurnable ? burnerRoleDef : "")
-      .replace("$MINTER_ROLE_SETUP$", isMintable ? minterRoleSetup : "-")
-      .replace("$BURNER_ROLE_SETUP$", isBurnable ? burnerRoleSetup : "-")
+      .replace("$MINTER_ROLE_GRANT$", isMintable ? minterRoleGrant : "-")
+      .replace("$BURNER_ROLE_GRANT$", isBurnable ? burnerRoleGrant : "-")
     : "";
 
   const maxSupplyAssignDef = isCappedSupply ? `maxSupply = ${maxSupply};` : "-";

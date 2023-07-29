@@ -31,16 +31,16 @@ export const supertokenBaseImportLocalPath = `import {SuperTokenBase} from "./ba
 
 export const minterRoleDef = `bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");`;
 export const burnerRoleDef = `bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");`;
-export const minterRoleSetup = "_setupRole(MINTER_ROLE, msg.sender);";
-export const burnerRoleSetup = "_setupRole(BURNER_ROLE, msg.sender);";
+export const minterRoleGrant = "_grantRole(MINTER_ROLE, msg.sender);";
+export const burnerRoleGrant = "_grantRole(BURNER_ROLE, msg.sender);";
 
 export const roleDefBlock = `$MINTER_ROLE_DEF$
 	$BURNER_ROLE_DEF$
 	
 	constructor() {
-		_setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-		$MINTER_ROLE_SETUP$
-		$BURNER_ROLE_SETUP$
+		_grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+		$MINTER_ROLE_GRANT$
+		$BURNER_ROLE_GRANT$
 	}`;
 
 export const cappedSupplyDefBlock = `error SupplyCapped();
