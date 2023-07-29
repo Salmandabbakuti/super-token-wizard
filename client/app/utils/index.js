@@ -112,8 +112,8 @@ export const isAddressValid = (address) => {
 
 export const generateCode = (wizardOptions) => {
   const {
-    licenseIdentifier = "UNLICENSED",
-    premintReceiver = "msg.sender",
+    licenseIdentifier,
+    premintReceiver,
     premintQuantity,
     maxSupply,
     isMintable,
@@ -122,6 +122,8 @@ export const generateCode = (wizardOptions) => {
     accessControl,
   } = wizardOptions;
 
+  const licenseIdentifierValue = licenseIdentifier || "UNLICENSED";
+  const premintReceiverValue = premintReceiver || "msg.sender";
   const premintQuantityValue = `${premintQuantity} * 10 ** 18`;
 
   const hasRolesAccessControl = accessControl === "roles";
@@ -143,14 +145,14 @@ export const generateCode = (wizardOptions) => {
   const accessControlInheritanceValue = hasRolesAccessControl ? ", AccessControl" : ", Ownable";
 
   const contractCode = baseContract
-    .replace("$LICENSE_IDENTIFIER$", licenseIdentifier)
+    .replace("$LICENSE_IDENTIFIER$", licenseIdentifierValue)
     .replace("$SUPERTOKEN_BASE_IMPORT$", supertokenBaseImport)
     .replace("$ACCESS_CONTROL_IMPORT$", accessControl ? accessControlImportValue : "")
     .replace("$ACCESS_CONTROL_INHERITANCE$", accessControl ? accessControlInheritanceValue : "")
     .replace("$CAPPED_SUPPLY_DEF_BLOCK$", isCappedSupply ? cappedSupplyDefBlock : "")
     .replace("$ROLE_DEF_BLOCK$", roleDefBlockValue)
     .replace("$MAX_SUPPLY_ASSIGN_DEF$", maxSupplyAssignDef)
-    .replace("$PREMINT_RECEIVER$", premintReceiver)
+    .replace("$PREMINT_RECEIVER$", premintReceiverValue)
     .replace("$PREMINT_QUANTITY$", premintQuantityValue)
     .replace("$MINT_FUNCTION$", isMintable ? mintFunctionValue : "")
     .replace("$MAX_SUPPLY_CHECK$", isCappedSupply ? maxSupplyCheck : "-")
