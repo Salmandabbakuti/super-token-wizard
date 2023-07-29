@@ -12,7 +12,8 @@ import {
   message,
   Select,
   Space,
-  Layout
+  Layout,
+  Radio
 } from "antd";
 import {
   CopyOutlined,
@@ -26,15 +27,16 @@ import styles from "./page.module.css";
 import "antd/dist/antd.css";
 
 import {
-  mainContract,
   supertokenBaseImport,
-  supertokenBaseImportLocalPath,
-  ownableImport,
-  mintFunction,
-  burnFunction
+  supertokenBaseImportLocalPath
 } from "./utils/contractTemplates";
 
-import { superTokenFactoryAddresses, chains, isAddressValid } from "./utils";
+import {
+  superTokenFactoryAddresses,
+  chains,
+  isAddressValid,
+  generateCode
+} from "./utils";
 
 const { Content, Footer } = Layout;
 
@@ -43,9 +45,11 @@ const compilerUrl = process.env.NEXT_PUBLIC_COMPILER_URL || "api/compile";
 export default function Home() {
   const [wizardOptions, setWizardOptions] = useState({
     premintQuantity: 1000,
+    maxSupply: 1000000,
     licenseIdentifier: "MIT",
     tokenName: "",
-    tokenSymbol: ""
+    tokenSymbol: "",
+    accessControl: ""
   });
   const [generatedCode, setGeneratedCode] = useState("");
   const [compiledOutput, setCompiledOutput] = useState(null);
@@ -69,36 +73,18 @@ export default function Home() {
   const handleGenerateCode = () => {
     setCompiledOutput(null);
     setContract(null);
-    const {
-      licenseIdentifier,
-      isOwnable,
-      premintReceiver,
-      premintQuantity,
-      isMintable,
-      isBurnable
-    } = wizardOptions;
+    const { premintReceiver, premintQuantity, maxSupply, isCappedSupply } =
+      wizardOptions;
 
     if (!premintQuantity)
       return message.error("Valid premint quantity is required");
+    if (isCappedSupply && !maxSupply)
+      return message.error("Max supply is required");
     if (premintReceiver && !isAddressValid(premintReceiver))
       return message.error("Invalid premint receiver address");
 
-    const licenseIdentifierValue = licenseIdentifier || "UNLICENSED";
-    const premintReceiverValue = premintReceiver || "msg.sender";
-    const premintQuantityValue = `${premintQuantity} * 10 ** 18`;
-    const contractCode = mainContract
-      .replace("$LICENSE_IDENTIFIER$", licenseIdentifierValue)
-      .replace("$SUPERTOKEN_BASE_IMPORT$", supertokenBaseImport)
-      .replace("$OWNABLE_IMPORT$", isOwnable ? ownableImport : "")
-      .replace("$OWNABLE_INHERITANCE$", isOwnable ? ", Ownable" : "")
-      .replace("$PREMINT_RECEIVER$", premintReceiverValue)
-      .replace("$PREMINT_QUANTITY$", premintQuantityValue)
-      .replace("$MINT_FUNCTION$", isMintable ? mintFunction : "")
-      .replace("$BURN_FUNCTION$", isBurnable ? burnFunction : "")
-      .replace("$ONLY_OWNER$", isOwnable ? "onlyOwner" : "")
-      .replace(/(\n\s*){2,}/gm, "\n$1");
-
-    setGeneratedCode(contractCode);
+    const generatedCode = generateCode(wizardOptions);
+    setGeneratedCode(generatedCode);
   };
 
   const handleCopyCode = () => {
@@ -197,7 +183,9 @@ export default function Home() {
       const provider = new Web3Provider(window.ethereum);
       const { chainId: currentChainId } = await provider.getNetwork();
       setSelectedChainId(
-        chains[currentChainId] ? currentChainId?.toString() : "⚠ Unsupported chain"
+        chains[currentChainId]
+          ? currentChainId?.toString()
+          : "⚠ Unsupported chain"
       );
       setLoading({ switch: false });
     }
@@ -304,11 +292,13 @@ export default function Home() {
     handleGenerateCode();
   }, [
     wizardOptions.premintQuantity,
+    wizardOptions.maxSupply,
     wizardOptions.premintReceiver,
     wizardOptions.isMintable,
     wizardOptions.isBurnable,
-    wizardOptions.isOwnable,
-    wizardOptions.licenseIdentifier
+    wizardOptions.isCappedSupply,
+    wizardOptions.licenseIdentifier,
+    wizardOptions.accessControl
   ]);
 
   return (
@@ -419,6 +409,22 @@ export default function Home() {
                 }
                 onChange={handleWizardOptionsChange}
               />
+              {wizardOptions?.isCappedSupply && (
+                <>
+                  <label htmlFor="maxSupply">Max Supply *</label>
+                  <Input
+                    id="maxSupply"
+                    name="maxSupply"
+                    type="number"
+                    placeholder="Max Supply"
+                    value={wizardOptions?.maxSupply}
+                    onChange={handleWizardOptionsChange}
+                    status={!wizardOptions?.maxSupply ? "error" : ""}
+                    min={1}
+                    max={1000000000000}
+                  />
+                </>
+              )}
             </div>
             <div className={styles.section}>
               <h3>Features</h3>
@@ -448,18 +454,39 @@ export default function Home() {
                   Burnable
                 </Checkbox>
                 <Checkbox
-                  id="isOwnable"
-                  checked={wizardOptions?.isOwnable}
+                  id="isCappedSupply"
+                  checked={wizardOptions?.isCappedSupply}
                   onChange={(e) =>
                     setWizardOptions({
                       ...wizardOptions,
-                      isOwnable: e.target.checked
+                      isCappedSupply: e.target.checked
                     })
                   }
                 >
-                  Ownable
+                  Capped Supply
                 </Checkbox>
               </Space>
+            </div>
+            <div className={styles.section}>
+              <h3>Access Control</h3>
+              <Radio.Group
+                id="accessControl"
+                name="accessControl"
+                value={wizardOptions?.accessControl}
+                buttonStyle="solid"
+                size="small"
+                options={[
+                  { label: "None", value: "" },
+                  { label: "Ownable", value: "ownable" },
+                  { label: "Roles", value: "roles" }
+                ]}
+                onChange={(e) =>
+                  setWizardOptions({
+                    ...wizardOptions,
+                    accessControl: e.target.value
+                  })
+                }
+              />
             </div>
             <div className={styles.section}>
               <h3>Miscellaneous</h3>
@@ -508,7 +535,7 @@ export default function Home() {
               value={generatedCode}
               style={{
                 fontFamily: "monospace",
-                fontSize: "14px",
+                fontSize: "13px",
                 backgroundColor: "#1f2430",
                 color: "#fff",
                 width: "100%",
@@ -520,7 +547,7 @@ export default function Home() {
               autoCapitalize="off"
               autoComplete="off"
               autoCorrect="off"
-              rows={25}
+              rows={30}
               cols={90}
             />
             <div className={styles.codeButtons}>

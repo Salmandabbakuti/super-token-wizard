@@ -2,15 +2,15 @@
 
 The SuperToken Wizard is a web-based interface that allows developers or individuals to easily deploy a Super Token contract without the need for manually searching for the right contracts and parameters or configuring them individually. With this wizard, you can quickly generate a customized Super Token contract based on your specific needs, copy it or open in remix directly for further customization and deployment, Wizard also allow you to deploy and initialize Super Token contract right from the app. You can also switch between different blockchain networks with in the wizard to deploy Super Tokens on your preferred network.
 
-![Screen1](https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/420e6d83-c2e8-4d65-867c-d9c0b1563bab)
+![Screen1](https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/3ee036eb-3868-4b6a-af2c-f15d7bfe745d)
 
-![Screen2](https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/c9da0908-d898-47b1-b83a-0c142f523ad7)
+![Screen2](https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/95c61074-9a7b-4bbb-beb2-6d2c5eacaf42)
 
 ## Features
 
 **1. Connect Wallet and Switch Networks:** The wizard allows you to connect your wallet and switch between different blockchain networks, enabling you to deploy Super Tokens on your preferred network.
 
-**2. Customizable Contract Generation:** You can input parameters such as token name, token symbol, premint quantity, and premint receiver address to generate a customized contract code for your Super Token. Additionally, you can enable or disable features like mintable, ownable, and burnable for the token.
+**2. Customizable Contract Generation:** You can input parameters such as token name, token symbol, premint quantity, and premint receiver address to generate a customized contract code for your Super Token. Additionally, you can enable or disable features like mintable, burnable, capped supply and access control(ownable or roles) for the token.
 
 **3. Copy and Open in Remix:** The generated contract code can be easily copied or opened in Remix IDE directly for further customization and deployment.
 
@@ -60,7 +60,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Demo
 
-https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/3784a598-ae2f-4557-905a-7425c336e853
+https://github.com/Salmandabbakuti/super-token-wizard/assets/29351207/4645190e-dd75-400b-8e85-7f5dae9b2c36
 
 ## Credits & Resources:
 
