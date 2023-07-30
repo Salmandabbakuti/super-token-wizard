@@ -40,7 +40,7 @@ import {
 
 const { Content, Footer } = Layout;
 
-const compilerUrl = process.env.NEXT_PUBLIC_COMPILER_URL || "api/compile";
+const compilerRoute = process.env.NEXT_PUBLIC_COMPILER_ROUTE || "api/compile";
 
 export default function Home() {
   const [wizardOptions, setWizardOptions] = useState({
@@ -200,7 +200,7 @@ export default function Home() {
         supertokenBaseImport,
         supertokenBaseImportLocalPath
       );
-      const response = await fetch(compilerUrl, {
+      const response = await fetch(compilerRoute, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

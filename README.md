@@ -48,7 +48,7 @@ The response will contain the compiled ABI and bytecode of the contract.
 
 Then, run the frontend development server:
 
-> Note: Copy `client/.env.example` to `client/.env` and update compiler API URL accordingly.
+> Note: Copy `client/.env.example` to `client/.env` and update compiler API Route accordingly.
 
 ```bash
 cd client
