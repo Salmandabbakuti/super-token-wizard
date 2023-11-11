@@ -20,12 +20,7 @@ app.use(
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res
-    .status(200)
-    .json({
-      message:
-        "Welcome to SuperToken Wizard API. Please navigate to https://super-token-wizard.vercel.app/"
-    });
+  res.redirect(301, "https://super-token-wizard.vercel.app")
 });
 
 app.post("/api/compile", async (req, res) => {

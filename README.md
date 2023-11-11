@@ -37,6 +37,13 @@ First, run the backend development server(hardhat compiler API):
 npm install
 npm run dev
 ```
+### Deploying backend To fly:
+
+```bash
+fly launch
+
+fly deploy
+```
 
 ## Usage(Compiler API)
 
