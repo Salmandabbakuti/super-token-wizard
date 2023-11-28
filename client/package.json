@@ -1,7 +1,7 @@
 {
   "name": "super-token-wizard",
   "description": "Superfluid's SuperToken Wizard",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "license": "MIT",
   "author": "Salman Dabbakuti",
@@ -12,14 +12,15 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.1.4",
+    "@ant-design/icons": "^5.2.6",
     "@ethersproject/address": "^5.7.0",
     "@ethersproject/contracts": "^5.7.0",
-    "@ethersproject/providers": "^5.7.2",
-    "antd": "4.23.2",
-    "eslint": "8.42.0",
-    "eslint-config-next": "13.4.4",
-    "next": "13.4.4",
+    "@thirdweb-dev/chains": "^0.1.59",
+    "@thirdweb-dev/react": "^4.1.10",
+    "antd": "5.11.5",
+    "eslint": "8.54.0",
+    "eslint-config-next": "14.0.3",
+    "next": "14.0.3",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   }

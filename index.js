@@ -19,20 +19,18 @@ app.use(
 );
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res
-    .status(200)
-    .json({
-      message:
-        "Welcome to SuperToken Wizard API. Please navigate to https://super-token-wizard.vercel.app/"
-    });
-});
+app.get("/", (req, res) =>
+  res.redirect(301, "https://super-token-wizard.vercel.app")
+);
 
 app.post("/api/compile", async (req, res) => {
   if (!req?.body?.code)
     return res
       .status(400)
-      .json({ code: "Bad request", message: "Missing required code parameter in body" });
+      .json({
+        code: "Bad request",
+        message: "Missing required code parameter in body"
+      });
   const contractCode = req.body.code;
   const id = new Date().toISOString().replace(/[^0-9]/gi, "");
   const fileName = `Contract_${id}.sol`;
@@ -53,7 +51,9 @@ app.post("/api/compile", async (req, res) => {
     return res.status(200).json({ abi, bytecode });
   } catch (err) {
     console.log(`Error while compiling: ${err.message}`);
-    return res.status(500).json({ code: "Compilation Error", message: err.message });
+    return res
+      .status(500)
+      .json({ code: "Compilation Error", message: err.message });
   } finally {
     fs.unlinkSync(filePath);
     fs.rmSync(path.join(__dirname, `artifacts/contracts/${fileName}`), {
