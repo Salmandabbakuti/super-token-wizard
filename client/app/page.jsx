@@ -130,6 +130,9 @@ export default function Home() {
       return message.error("Please compile the code first");
     setLoading({ deploy: true });
     try {
+      const chainId = await signer.getChainId();
+      const factoryAddress = superTokenFactoryAddresses[chainId];
+      if (!factoryAddress) return message.error("Unsupported chain. Please switch to supported chain");
       const contractFactory = new ContractFactory(
         compiledOutput.abi,
         compiledOutput.bytecode,
@@ -164,6 +167,7 @@ export default function Home() {
     try {
       const chainId = await signer.getChainId();
       const factoryAddress = superTokenFactoryAddresses[chainId];
+      if (!factoryAddress) return message.error("Unsupported chain. Please switch to supported chain");
       const tx = await contract.initialize(
         factoryAddress,
         wizardOptions?.tokenName,

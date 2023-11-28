@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { Button } from 'antd';
 
-export default function Error({ error, reset }) {
+export default function Err({ error, reset }) {
   useEffect(() => {
     console.error(error);
   }, [error]);
