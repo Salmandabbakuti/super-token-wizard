@@ -70,10 +70,10 @@ export default function Home() {
 
     if (!premintQuantity)
       return message.error("Valid premint quantity is required");
-    if (isCappedSupply && !maxSupply)
-      return message.error("Max supply is required");
     if (premintReceiver && !isAddressValid(premintReceiver))
       return message.error("Invalid premint receiver address");
+    if (isCappedSupply && !maxSupply)
+      return message.error("Max supply is required");
 
     const generatedCode = generateCode(wizardOptions);
     setGeneratedCode(generatedCode);
@@ -87,8 +87,8 @@ export default function Home() {
 
   const handleCompile = async () => {
     if (!generatedCode) return message.error("Please generate the code first");
+    setLoading({ compile: true });
     try {
-      setLoading({ compile: true });
       // using local import path for compilation
       const codeForCompilation = generatedCode.replace(
         supertokenBaseImport,
@@ -102,17 +102,14 @@ export default function Home() {
         body: JSON.stringify({ code: codeForCompilation })
       });
       const data = await response.json();
-      if (data.code && data.message) {
-        setLoading({ compile: false });
-        return message.error(data.message);
-      }
+      if (data.code && data.message) return message.error(data.message);
       setCompiledOutput(data);
-      setLoading({ compile: false });
       message.success("Code compiled successfully");
     } catch (err) {
-      setLoading({ compile: false });
       console.error("Error compiling code", err);
       message.error("Something went wrong while compiling the code");
+    } finally {
+      setLoading({ compile: false });
     }
   };
 
@@ -146,11 +143,11 @@ export default function Home() {
       setLogMessage(`Contract deployed at address: ${contract.address}`);
       setContract(contract);
       message.success("Contract deployed successfully");
-      setLoading({ deploy: false });
     } catch (err) {
-      setLoading({ deploy: false });
       console.error("Error deploying contract", err);
       message.error("Something went wrong while deploying the contract");
+    } finally {
+      setLoading({ deploy: false });
     }
   };
 
@@ -178,11 +175,11 @@ export default function Home() {
       message.success("Contract initialized successfully");
       setContract(null);
       setLogMessage(`Contract initialized successfully`);
-      setLoading({ initialize: false });
     } catch (err) {
-      setLoading({ initialize: false });
       console.error("Error initializing contract", err);
       message.error("Something went wrong while initializing the contract");
+    } finally {
+      setLoading({ initialize: false });
     }
   };
 
