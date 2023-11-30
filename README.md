@@ -20,9 +20,9 @@ The SuperToken Wizard is a web-based interface that allows developers or individ
 
 #### Tech Stack
 
-- Frontend: Next.js, Antd
+- Frontend: Next.js, Antd, Thirdweb
 - Backend: Node.js, Express.js
-- Web3 Client: ethers.js
+- Web3 Client: ethers.js, Thirdweb
 - Smartcontracts: Solidity, Hardhat, OpenZeppelin, Superfluid Contracts
 
 ## Getting Started
@@ -48,7 +48,7 @@ The response will contain the compiled ABI and bytecode of the contract.
 
 Then, run the frontend development server:
 
-> Note: Copy `client/.env.example` to `client/.env` and update compiler API Route accordingly.
+> Note: Copy `client/.env.example` to `client/.env` and update the values with your own.
 
 ```bash
 cd client
