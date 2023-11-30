@@ -1,6 +1,6 @@
 {
   "name": "super-token-wizard-backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Super Token Wizard Backend",
   "private": true,
   "main": "index.js",
@@ -17,9 +17,9 @@
     "@superfluid-finance/ethereum-contracts": "^1.7.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "hardhat": "^2.15.0"
+    "hardhat": "^2.19.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^3.0.1"
   }
 }

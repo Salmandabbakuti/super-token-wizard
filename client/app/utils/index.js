@@ -25,83 +25,12 @@ export const superTokenFactoryAddresses = {
   1: "0x0422689cc4087b6B7280e0a7e7F655200ec86Ae1",
   56: "0x8bde47397301F0Cd31b9000032fD517a39c946Eb",
   43114: "0x464AADdBB2B80f3Cb666522EB7381bE610F638b4",
-  42220: "0x36be86dEe6BC726Ed0Cbd170ccD2F21760BC73D9"
-};
-
-export const chains = {
-  80001: {
-    chainId: "0x13881",
-    chainName: "Mumbai Testnet",
-    nativeCurrency: {
-      name: "MATIC",
-      symbol: "MATIC",
-      decimals: 18
-    },
-    rpcUrls: [
-      "https://rpc-mumbai.maticvigil.com",
-      "https://rpc.ankr.com/polygon_mumbai",
-      "https://matic-mumbai.chainstacklabs.com"
-    ],
-    blockExplorerUrls: ["https://mumbai.polygonscan.com"]
-  },
-  137: {
-    chainId: "0x89",
-    chainName: "Polygon Mainnet",
-    nativeCurrency: {
-      name: "MATIC",
-      symbol: "MATIC",
-      decimals: 18
-    },
-    rpcUrls: [
-      "https://rpc-mainnet.maticvigil.com",
-      "https://matic-mainnet.chainstacklabs.com"
-    ],
-    blockExplorerUrls: ["https://polygonscan.com"]
-  },
-  5: {
-    chainId: "0x5",
-    chainName: "Goerli"
-  },
-  1: {
-    chainId: "0x1",
-    chainName: "Ethereum Mainnet"
-  },
-  56: {
-    chainId: "0x38",
-    chainName: "Binance Mainnet",
-    nativeCurrency: {
-      name: "BNB",
-      symbol: "BNB",
-      decimals: 18
-    },
-    rpcUrls: ["https://bsc-dataseed.binance.org", "https://bsc.nodereal.io"],
-    blockExplorerUrls: ["https://bscscan.com"]
-  },
-  43114: {
-    chainId: "0xa86a",
-    chainName: "Avalanche Mainnet",
-    nativeCurrency: {
-      name: "AVAX",
-      symbol: "AVAX",
-      decimals: 18
-    },
-    rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
-    blockExplorerUrls: ["https://snowtrace.io/"]
-  },
-  42220: {
-    chainId: "0xa4ec",
-    chainName: "Celo Mainnet",
-    nativeCurrency: {
-      name: "CELO",
-      symbol: "CELO",
-      decimals: 18
-    },
-    rpcUrls: ["https://forno.celo.org"],
-    blockExplorerUrls: ["https://explorer.celo.org"]
-  }
+  42220: "0x36be86dEe6BC726Ed0Cbd170ccD2F21760BC73D9",
+  8453: "0xe20B9a38E0c96F61d1bA6b42a61512D56Fea1Eb3"
 };
 
 export const isAddressValid = (address) => {
+  console.log("isAddressValid server", address);
   try {
     getAddress(address);
     return true;
