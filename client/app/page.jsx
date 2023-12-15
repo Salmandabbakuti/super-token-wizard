@@ -1,17 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ContractFactory } from "@ethersproject/contracts";
 import { useAddress, useSigner } from "@thirdweb-dev/react";
-import {
-  Input,
-  Checkbox,
-  Button,
-  message,
-  Space,
-  Radio
-} from "antd";
+import { Input, Checkbox, Button, message, Space, Radio, Tour } from "antd";
 import {
   CopyOutlined,
   ThunderboltOutlined,
@@ -32,7 +25,8 @@ import {
   generateCode
 } from "./utils";
 
-const compilerEndpoint = process.env.NEXT_PUBLIC_COMPILER_ENDPOINT || "api/compile";
+const compilerEndpoint =
+  process.env.NEXT_PUBLIC_COMPILER_ENDPOINT || "api/compile";
 
 export default function Home() {
   const [wizardOptions, setWizardOptions] = useState({
@@ -54,6 +48,11 @@ export default function Home() {
     deploy: false,
     initialize: false
   });
+  const [showTour, setShowTour] = useState(false);
+
+  const codeHeaderRef = useRef(null);
+  const tokenOptionsRef = useRef(null);
+  const actionsRef = useRef(null);
 
   const account = useAddress();
   const signer = useSigner();
@@ -129,7 +128,10 @@ export default function Home() {
     try {
       const chainId = await signer.getChainId();
       const factoryAddress = superTokenFactoryAddresses[chainId];
-      if (!factoryAddress) return message.error("Unsupported chain. Please switch to supported chain");
+      if (!factoryAddress)
+        return message.error(
+          "Unsupported chain. Please switch to supported chain"
+        );
       const contractFactory = new ContractFactory(
         compiledOutput.abi,
         compiledOutput.bytecode,
@@ -164,7 +166,10 @@ export default function Home() {
     try {
       const chainId = await signer.getChainId();
       const factoryAddress = superTokenFactoryAddresses[chainId];
-      if (!factoryAddress) return message.error("Unsupported chain. Please switch to supported chain");
+      if (!factoryAddress)
+        return message.error(
+          "Unsupported chain. Please switch to supported chain"
+        );
       const tx = await contract.initialize(
         factoryAddress,
         wizardOptions?.tokenName,
@@ -196,9 +201,16 @@ export default function Home() {
     wizardOptions.accessControl
   ]);
 
+  useEffect(() => {
+    const productTour = localStorage.getItem("product_tour") === null;
+    if (productTour) {
+      setShowTour(true);
+    }
+  }, []);
+
   return (
     <div className={styles.container}>
-      <div className={styles.options}>
+      <div className={styles.options} ref={tokenOptionsRef}>
         <div className={styles.section}>
           <h3>Token Options</h3>
           <label htmlFor="tokenName">Name *</label>
@@ -242,7 +254,7 @@ export default function Home() {
             allowClear
             status={
               wizardOptions?.premintReceiver &&
-                !isAddressValid(wizardOptions?.premintReceiver)
+              !isAddressValid(wizardOptions?.premintReceiver)
                 ? "error"
                 : ""
             }
@@ -341,7 +353,7 @@ export default function Home() {
         </div>
       </div>
       <div className={styles.code}>
-        <div className={styles.codeHeader}>
+        <div className={styles.codeHeader} ref={codeHeaderRef}>
           <Button
             icon={<CopyOutlined />}
             onClick={handleCopyCode}
@@ -349,9 +361,7 @@ export default function Home() {
             title="Copy Code"
           />
           <Link
-            href={`https://remix.ethereum.org/?#code=${btoa(
-              generatedCode
-            )}`}
+            href={`https://remix.ethereum.org/?#code=${btoa(generatedCode)}`}
             target="_blank"
           >
             <Button
@@ -389,7 +399,7 @@ export default function Home() {
           rows={30}
           cols={90}
         />
-        <div className={styles.codeButtons}>
+        <div className={styles.codeButtons} ref={actionsRef}>
           <Button
             type="primary"
             icon={<SendOutlined />}
@@ -431,6 +441,45 @@ export default function Home() {
           <div className={styles.logBox}>
             <p>{logMessage}</p>
           </div>
+        )}
+        {showTour && (
+          <Tour
+            placement="top"
+            open={showTour}
+            onClose={() => {
+              setShowTour(false);
+              localStorage.setItem("product_tour", "done");
+            }}
+            steps={[
+              {
+                title: "Welcome to SuperToken Wizard",
+                description:
+                  "A simple and ligthweight wizard for Super Tokens. Quickly generate a customized Super Token contract based on your specific needs.",
+                target: () => null
+              },
+              {
+                title: "Customizable Contract Options",
+                description:
+                  "Customize your Super Token contract options. Enable or disable features, set token name, symbol, premint quantity, max supply, access control and more.",
+                placement: "right",
+                target: () => tokenOptionsRef.current
+              },
+              {
+                title: "Copy or Open in Remix",
+                description:
+                  "Copy the generated code or open directly in Remix.",
+                placement: "bottom",
+                target: () => codeHeaderRef.current
+              },
+              {
+                title: "Actions",
+                description:
+                  "Compile, Copy Artifacts, deploy and initialize the contract.",
+                placement: "top",
+                target: () => actionsRef.current
+              }
+            ]}
+          />
         )}
       </div>
     </div>

@@ -15,13 +15,15 @@
     "@ant-design/icons": "^5.2.6",
     "@ethersproject/address": "^5.7.0",
     "@ethersproject/contracts": "^5.7.0",
-    "@thirdweb-dev/chains": "^0.1.59",
-    "@thirdweb-dev/react": "^4.1.10",
-    "antd": "5.11.5",
-    "eslint": "8.54.0",
-    "eslint-config-next": "14.0.3",
-    "next": "14.0.3",
+    "@thirdweb-dev/chains": "^0.1.61",
+    "@thirdweb-dev/react": "^4.1.16",
+    "antd": "5.12.2",
+    "next": "14.0.4",
     "react": "18.2.0",
     "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "eslint": "8.55.0",
+    "eslint-config-next": "14.0.4"
   }
 }

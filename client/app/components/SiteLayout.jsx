@@ -25,14 +25,12 @@ export default function SiteLayout({ children }) {
         <div className={styles.navbarButtons}>
           <ConnectWallet
             theme="light"
-            modalSize={"compact"} // compact | wide
+            modalSize={"wide"} // compact | wide
           />
         </div>
       </div>
-      <Content style={{ minHeight: 300 }}>
-        {children}
-      </Content>
-      <Footer style={{ textAlign: "center" }}>
+      <Content style={{ minHeight: 300 }}>{children}</Content>
+      <Footer className={styles.footer}>
         <a
           href="https://github.com/Salmandabbakuti"
           target="_blank"
