@@ -64,7 +64,7 @@ export const generateCode = (wizardOptions) => {
       .replace("$BURNER_ROLE_GRANT$", isBurnable ? burnerRoleGrant : "-")
     : "";
 
-  const maxSupplyAssignDef = isCappedSupply ? `maxSupply = ${maxSupply};` : "-";
+  const maxSupplyAssignDef = isCappedSupply ? `maxSupply = ${maxSupply} * 10 ** 18;` : "-";
 
   // Determine the mint and burn functions based on user acl choice
   const mintFunctionValue = hasRolesAccessControl ? mintFunctionWithRole : mintFunction;

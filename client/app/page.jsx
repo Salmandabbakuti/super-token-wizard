@@ -236,7 +236,7 @@ export default function Home() {
             id="premintQuantity"
             name="premintQuantity"
             type="number"
-            placeholder="Premint Quantity"
+            placeholder="Premint Quantity in no.of tokens"
             value={wizardOptions?.premintQuantity}
             onChange={handleWizardOptionsChange}
             status={!wizardOptions?.premintQuantity ? "error" : ""}
@@ -267,7 +267,7 @@ export default function Home() {
                 id="maxSupply"
                 name="maxSupply"
                 type="number"
-                placeholder="Max Supply"
+                placeholder="Max Supply in no.of tokens"
                 value={wizardOptions?.maxSupply}
                 onChange={handleWizardOptionsChange}
                 status={!wizardOptions?.maxSupply ? "error" : ""}
